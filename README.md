@@ -1,0 +1,3 @@
+Requires:
+pdfbox
+commons-logging
