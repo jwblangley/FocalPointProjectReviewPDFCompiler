@@ -1,13 +1,11 @@
-package pdfSuffixInterleaver.view;
+package jwblangley.pdfSuffixInterleaver.view;
 
-import javafx.application.Application;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
-public class ViewLayout extends Application {
+public class ViewLayout {
 
   private static final int WIDTH = 500;
   private static final int HEIGHT = 200;
@@ -29,14 +27,4 @@ public class ViewLayout extends Application {
     return layout;
   }
 
-  @Override
-  public void start(Stage stage) throws Exception {
-
-    Scene scene = new Scene(ViewLayout.layout(stage));
-
-    stage.setTitle("PDF Suffix Interleaver");
-    stage.setScene(scene);
-    stage.centerOnScreen();
-    stage.show();
-  }
 }
