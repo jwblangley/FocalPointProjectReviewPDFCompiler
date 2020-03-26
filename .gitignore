@@ -1,5 +1,6 @@
 *.iml
 out/
 .idea/
+META-INF/
 
 *.pdf

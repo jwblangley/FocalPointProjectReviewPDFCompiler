@@ -3,9 +3,9 @@ package jwblangley.pdfSuffixInterleaver.model;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import jwblangley.pdfSuffixInterleaver.filenamer.CountPDFNamer;
 import jwblangley.pdfSuffixInterleaver.filenamer.NoOverwritePDFNamer;
 import jwblangley.pdfSuffixInterleaver.filenamer.PDFNamer;
+import jwblangley.pdfSuffixInterleaver.filenamer.PaprikaProjectCodePDFNamer;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -17,7 +17,7 @@ public class PDFSuffixInterleaver {
     PDDocument suffixPage = PDDocument.load(suffix);
 
     Splitter splitter = new Splitter();
-    PDFNamer pdfNamer = new NoOverwritePDFNamer(new CountPDFNamer());
+    PDFNamer pdfNamer = new NoOverwritePDFNamer(new PaprikaProjectCodePDFNamer());
 
     List<PDDocument> pages = splitter.split(mainDoc);
 
