@@ -73,14 +73,16 @@ public class ViewLayout {
 
   private void handleSelectButton(ActionEvent e) {
     // File chooser
+    Button source = (Button) e.getSource();
+
     FileChooser fc = new FileChooser();
-    fc.setTitle("Image file to reveal from");
+    fc.setTitle(source == selectSuffixButton ? "Select suffix file" : "Select document file");
     FileChooser.ExtensionFilter pdfFilter
         = new ExtensionFilter("PDF Documents", "*.pdf");
     fc.getExtensionFilters().add(pdfFilter);
 
 
-    Button source = (Button) e.getSource();
+
     File chosenFile = fc.showOpenDialog(source.getScene().getWindow());
 
     if (source == selectSuffixButton) {
