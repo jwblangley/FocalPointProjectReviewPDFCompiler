@@ -3,6 +3,7 @@ package jwblangley.pdfSuffixInterleaver.controller;
 import java.io.File;
 import java.io.IOException;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import jwblangley.pdfSuffixInterleaver.model.PDFSuffixInterleaver;
@@ -34,14 +35,17 @@ public class Controller extends Application {
       layout.reportStatus("Please select a Paprika pdf", false);
       return;
     }
-    try {
-      layout.reportStatus("Working...", true);
-      PDFSuffixInterleaver.interleaveSuffixSeparateAndSave(suffixPdf, documentPdf);
-      layout.reportStatus("Process complete", true);
-    } catch (IOException e) {
-      e.printStackTrace();
-      layout.reportStatus("An error occurred", false);
-    }
+    layout.reportStatus("Working...", true);
+    new Thread(() -> {
+      try {
+        PDFSuffixInterleaver.interleaveSuffixSeparateAndSave(suffixPdf, documentPdf);
+        Platform.runLater(() -> layout.reportStatus("Process complete", true));
+      } catch (IOException e) {
+        e.printStackTrace();
+        Platform.runLater(() -> layout.reportStatus("An error occurred", false));
+      }
+    }).start();
+
   }
 
   @Override
