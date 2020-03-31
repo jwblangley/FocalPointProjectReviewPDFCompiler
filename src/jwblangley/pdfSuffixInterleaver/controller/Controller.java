@@ -10,6 +10,8 @@ import jwblangley.pdfSuffixInterleaver.view.ViewLayout;
 
 public class Controller extends Application {
 
+  private static final String VERSION = "v1.0.1";
+
   private ViewLayout layout;
 
   private File documentPdf;
@@ -47,7 +49,7 @@ public class Controller extends Application {
     layout = new ViewLayout(this);
     Scene scene = new Scene(layout.layout(stage));
 
-    stage.setTitle("Project Review PDF Compiler - v1.0.0");
+    stage.setTitle("Project Review PDF Compiler - " + VERSION);
     stage.setScene(scene);
     stage.centerOnScreen();
     stage.show();

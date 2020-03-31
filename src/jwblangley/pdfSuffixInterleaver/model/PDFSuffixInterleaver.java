@@ -30,6 +30,7 @@ public class PDFSuffixInterleaver {
       merger.appendDocument(resultDoc, suffixPage);
 
       resultDoc.save(pdfNamer.namePDF(resultDoc));
+      resultDoc.close();
     }
 
     // Close documents
