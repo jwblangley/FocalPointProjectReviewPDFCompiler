@@ -25,11 +25,11 @@ public class Controller extends Application {
 
   public void runInterleaver() {
     if (suffixPdf == null) {
-      layout.reportStatus("Please select a suffix pdf", false);
+      layout.reportStatus("Please select a project review pdf", false);
       return;
     }
     if (documentPdf == null) {
-      layout.reportStatus("Please select a document pdf", false);
+      layout.reportStatus("Please select a Paprika pdf", false);
       return;
     }
     try {

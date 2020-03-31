@@ -80,7 +80,7 @@ public class ViewLayout {
     Button source = (Button) e.getSource();
 
     FileChooser fc = new FileChooser();
-    fc.setTitle(source == selectSuffixButton ? "Select suffix file" : "Select document file");
+    fc.setTitle(source == selectSuffixButton ? "Select project review file" : "Select Paprika file");
     FileChooser.ExtensionFilter pdfFilter
         = new ExtensionFilter("PDF Documents", "*.pdf");
     fc.getExtensionFilters().add(pdfFilter);
