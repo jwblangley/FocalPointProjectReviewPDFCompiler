@@ -11,7 +11,7 @@ import jwblangley.pdfSuffixInterleaver.view.ViewLayout;
 
 public class Controller extends Application {
 
-  private static final String VERSION = "v1.0.1";
+  private static final String VERSION = "v2.0.0";
 
   private ViewLayout layout;
 

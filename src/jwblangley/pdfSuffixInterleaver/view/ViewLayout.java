@@ -85,8 +85,6 @@ public class ViewLayout {
         = new ExtensionFilter("PDF Documents", "*.pdf");
     fc.getExtensionFilters().add(pdfFilter);
 
-
-
     File chosenFile = fc.showOpenDialog(source.getScene().getWindow());
 
     if (source == selectSuffixButton) {
