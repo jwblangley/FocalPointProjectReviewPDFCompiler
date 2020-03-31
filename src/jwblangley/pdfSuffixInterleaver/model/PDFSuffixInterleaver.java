@@ -12,7 +12,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 
 public class PDFSuffixInterleaver {
 
-  public static void interleaveSuffixSeparateAndSave(File suffix, File document) throws IOException {
+  public static void interleaveSuffixSeparateAndSave(File suffix, File document)
+      throws IOException {
     PDDocument suffixPage = PDDocument.load(suffix);
     PDDocument mainDoc = PDDocument.load(document);
 
