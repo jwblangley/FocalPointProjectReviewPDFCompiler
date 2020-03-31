@@ -15,6 +15,7 @@ public class PaprikaProjectPDFNamer implements PDFNamer {
 
   @Override
   public String namePDF(PDDocument document) {
+    // N.B: does not close document
     try {
       PDFTextStripper textStripper = new PDFTextStripper();
       String pdfContent = textStripper.getText(document);

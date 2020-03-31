@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import jwblangley.pdfSuffixInterleaver.filenamer.NoOverwritePDFNamer;
 import jwblangley.pdfSuffixInterleaver.filenamer.PDFNamer;
-import jwblangley.pdfSuffixInterleaver.filenamer.PaprikaProjectCodePDFNamer;
+import jwblangley.pdfSuffixInterleaver.filenamer.PaprikaProjectPDFNamer;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -13,11 +13,11 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 public class PDFSuffixInterleaver {
 
   public static void interleaveSuffixSeparateAndSave(File suffix, File document) throws IOException {
-    PDDocument mainDoc = PDDocument.load(document);
     PDDocument suffixPage = PDDocument.load(suffix);
+    PDDocument mainDoc = PDDocument.load(document);
 
     Splitter splitter = new Splitter();
-    PDFNamer pdfNamer = new NoOverwritePDFNamer(new PaprikaProjectCodePDFNamer());
+    PDFNamer pdfNamer = new NoOverwritePDFNamer(new PaprikaProjectPDFNamer());
 
     List<PDDocument> pages = splitter.split(mainDoc);
 
@@ -31,11 +31,12 @@ public class PDFSuffixInterleaver {
 
       resultDoc.save(pdfNamer.namePDF(resultDoc));
       resultDoc.close();
+      page.close();
     }
 
     // Close documents
-    mainDoc.close();
     suffixPage.close();
+    mainDoc.close();
   }
 
 }
