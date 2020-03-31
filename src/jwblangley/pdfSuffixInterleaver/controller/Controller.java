@@ -47,7 +47,7 @@ public class Controller extends Application {
     layout = new ViewLayout(this);
     Scene scene = new Scene(layout.layout(stage));
 
-    stage.setTitle("PDF Suffix Interleaver");
+    stage.setTitle("Project Review PDF Compiler - v1.0.0");
     stage.setScene(scene);
     stage.centerOnScreen();
     stage.show();

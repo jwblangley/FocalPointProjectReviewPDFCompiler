@@ -9,6 +9,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -38,24 +39,27 @@ public class ViewLayout {
     HBox buttonLayout = new HBox(5);
     buttonLayout.setPrefSize(WIDTH, HEIGHT);
 
-    selectSuffixButton = new Button("Select suffix file");
-    selectSuffixButton.setPrefSize(WIDTH / 3, HEIGHT);
-    selectSuffixButton.setFont(font);
-    selectSuffixButton.wrapTextProperty().setValue(true);
-    selectSuffixButton.setOnAction(this::handleSelectButton);
-
-    selectDocumentButton = new Button("Select document file");
+    selectDocumentButton = new Button("Select Paprika file");
     selectDocumentButton.setPrefSize(WIDTH / 3, HEIGHT);
     selectDocumentButton.setFont(font);
     selectDocumentButton.wrapTextProperty().setValue(true);
+    selectDocumentButton.setTextAlignment(TextAlignment.CENTER);
     selectDocumentButton.setOnAction(this::handleSelectButton);
+
+    selectSuffixButton = new Button("Select Project Review file");
+    selectSuffixButton.setPrefSize(WIDTH / 3, HEIGHT);
+    selectSuffixButton.setFont(font);
+    selectSuffixButton.wrapTextProperty().setValue(true);
+    selectSuffixButton.setTextAlignment(TextAlignment.CENTER);
+    selectSuffixButton.setOnAction(this::handleSelectButton);
 
     Button goButton = new Button("Go!");
     goButton.setPrefSize(WIDTH / 3, HEIGHT);
     goButton.setFont(font);
+    goButton.setTextAlignment(TextAlignment.CENTER);
     goButton.setOnAction(e -> controller.runInterleaver());
 
-    buttonLayout.getChildren().addAll(selectSuffixButton, selectDocumentButton, goButton);
+    buttonLayout.getChildren().addAll(selectDocumentButton, selectSuffixButton, goButton);
 
     rootNode.setTop(buttonLayout);
 
