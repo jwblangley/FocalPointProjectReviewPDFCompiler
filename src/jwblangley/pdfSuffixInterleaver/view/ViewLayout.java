@@ -10,6 +10,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -40,26 +41,44 @@ public class ViewLayout {
     buttonLayout.setPrefSize(WIDTH, HEIGHT);
 
     selectDocumentButton = new Button("Select Paprika file");
-    selectDocumentButton.setPrefSize(WIDTH / 3, HEIGHT);
+    selectDocumentButton.setPrefSize(WIDTH / 4, HEIGHT);
     selectDocumentButton.setFont(font);
     selectDocumentButton.wrapTextProperty().setValue(true);
     selectDocumentButton.setTextAlignment(TextAlignment.CENTER);
-    selectDocumentButton.setOnAction(this::handleSelectButton);
+    selectDocumentButton.setOnAction(this::handleSelectFileButton);
 
     selectSuffixButton = new Button("Select Project Review file");
-    selectSuffixButton.setPrefSize(WIDTH / 3, HEIGHT);
+    selectSuffixButton.setPrefSize(WIDTH / 4, HEIGHT);
     selectSuffixButton.setFont(font);
     selectSuffixButton.wrapTextProperty().setValue(true);
     selectSuffixButton.setTextAlignment(TextAlignment.CENTER);
-    selectSuffixButton.setOnAction(this::handleSelectButton);
+    selectSuffixButton.setOnAction(this::handleSelectFileButton);
+
+    Button selectOutputDirButton = new Button("Select Output Directory");
+    selectOutputDirButton.setPrefSize(WIDTH / 4, HEIGHT);
+    selectOutputDirButton.setFont(font);
+    selectOutputDirButton.wrapTextProperty().setValue(true);
+    selectOutputDirButton.setTextAlignment(TextAlignment.CENTER);
+    selectOutputDirButton.setOnAction(e -> {
+      DirectoryChooser dc = new DirectoryChooser();
+      dc.setTitle("Select output directory");
+
+      File chosenDirecory = dc.showDialog(window);
+      controller.setOutputDirectory(chosenDirecory);
+    });
 
     Button goButton = new Button("Go!");
-    goButton.setPrefSize(WIDTH / 3, HEIGHT);
+    goButton.setPrefSize(WIDTH / 4, HEIGHT);
     goButton.setFont(font);
     goButton.setTextAlignment(TextAlignment.CENTER);
     goButton.setOnAction(e -> controller.runInterleaver());
 
-    buttonLayout.getChildren().addAll(selectDocumentButton, selectSuffixButton, goButton);
+    buttonLayout.getChildren().addAll(
+        selectDocumentButton,
+        selectSuffixButton,
+        selectOutputDirButton,
+        goButton
+    );
 
     rootNode.setTop(buttonLayout);
 
@@ -75,7 +94,7 @@ public class ViewLayout {
     statusLabel.setTextFill(successful ? Color.GREEN : Color.RED);
   }
 
-  private void handleSelectButton(ActionEvent e) {
+  private void handleSelectFileButton(ActionEvent e) {
     // File chooser
     Button source = (Button) e.getSource();
 
