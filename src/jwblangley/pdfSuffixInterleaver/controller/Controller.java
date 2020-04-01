@@ -47,7 +47,8 @@ public class Controller extends Application {
     layout.reportStatus("Working...", true);
     new Thread(() -> {
       try {
-        PDFSuffixInterleaver.interleaveSuffixSeparateAndSave(suffixPdf, documentPdf, outputDirectory);
+        PDFSuffixInterleaver
+            .interleaveSuffixSeparateAndSave(suffixPdf, documentPdf, outputDirectory);
         Platform.runLater(() -> layout.reportStatus("Process complete", true));
       } catch (IOException e) {
         e.printStackTrace();
