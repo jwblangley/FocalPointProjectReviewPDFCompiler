@@ -17,6 +17,7 @@ public class Controller extends Application {
 
   private File documentPdf;
   private File suffixPdf;
+  private File outputDirectory;
 
   public void setDocumentPdf(File documentPdf) {
     this.documentPdf = documentPdf;
@@ -24,6 +25,10 @@ public class Controller extends Application {
 
   public void setSuffixPdf(File suffixPdf) {
     this.suffixPdf = suffixPdf;
+  }
+
+  public void setOutputDirectory(File outputDirectory) {
+    this.outputDirectory = outputDirectory;
   }
 
   public void runInterleaver() {
@@ -38,7 +43,7 @@ public class Controller extends Application {
     layout.reportStatus("Working...", true);
     new Thread(() -> {
       try {
-        PDFSuffixInterleaver.interleaveSuffixSeparateAndSave(suffixPdf, documentPdf);
+        PDFSuffixInterleaver.interleaveSuffixSeparateAndSave(suffixPdf, documentPdf, outputDirectory);
         Platform.runLater(() -> layout.reportStatus("Process complete", true));
       } catch (IOException e) {
         e.printStackTrace();
