@@ -12,13 +12,13 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 
 public class PDFSuffixInterleaver {
 
-  public static void interleaveSuffixSeparateAndSave(File suffix, File document, File outputDirectory)
-      throws IOException {
+  public static void interleaveSuffixSeparateAndSave(File suffix, File document,
+      File outputDirectory) throws IOException {
     PDDocument suffixPage = PDDocument.load(suffix);
     PDDocument mainDoc = PDDocument.load(document);
 
     Splitter splitter = new Splitter();
-    PDFNamer pdfNamer = new NoOverwritePDFNamer(new PaprikaProjectPDFNamer());
+    PDFNamer pdfNamer = new NoOverwritePDFNamer(new PaprikaProjectPDFNamer(), outputDirectory);
 
     List<PDDocument> pages = splitter.split(mainDoc);
 
@@ -40,6 +40,11 @@ public class PDFSuffixInterleaver {
     // Close documents
     suffixPage.close();
     mainDoc.close();
+  }
+
+  public static void interleaveSuffixSeparateAndSave(File suffix, File document)
+      throws IOException {
+    interleaveSuffixSeparateAndSave(suffix, document, new File("").getAbsoluteFile());
   }
 
 }
