@@ -14,11 +14,12 @@ public class PaprikaProjectPDFNamer implements PDFNamer {
 
   private static final String FALLBACK_NAME = "paprika-file.pdf";
 
-  private static final String PROJECT_CODE_EX = "Project\\sManager\\s*(\\S*)/";
-  private static final String DATE_EX = "Page \\d of \\d\\s+(\\d+\\s+\\S+\\s+\\d+)";
+  private static final String PROJECT_CODE_EX = "Project\\s*?Manager\\s*?(\\S*?)/";
+  private static final String DATE_EX = "Page \\d+? of \\d+?\\s+?(\\d+?\\s+?\\S+?\\s+?\\d+?)\\s";
 
   // N.B: %s will be replaced by project code
-  private static final String PROJECT_MANAGER_EX = "%s.*\\s+([A-Z]+)\\s";
+  // N.B: greedy '.*' is intended
+  private static final String PROJECT_MANAGER_EX = "%s.*\\s([A-Z]+?)\\s";
 
   @Override
   public String namePDF(PDDocument document) {
