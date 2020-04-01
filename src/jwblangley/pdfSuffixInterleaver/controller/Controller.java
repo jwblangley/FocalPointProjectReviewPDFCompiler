@@ -40,6 +40,10 @@ public class Controller extends Application {
       layout.reportStatus("Please select a Paprika pdf", false);
       return;
     }
+    if (outputDirectory == null) {
+      layout.reportStatus("Please select an output directory", false);
+      return;
+    }
     layout.reportStatus("Working...", true);
     new Thread(() -> {
       try {
