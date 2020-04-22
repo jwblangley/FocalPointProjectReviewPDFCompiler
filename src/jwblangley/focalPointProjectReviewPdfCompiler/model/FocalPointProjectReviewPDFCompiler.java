@@ -5,20 +5,25 @@ import java.io.IOException;
 import java.util.List;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.NoOverwritePDFNamer;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.PDFNamer;
-import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.PaprikaProjectPDFNamer;
+import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.FocalPointProjectReviewPDFNamer;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
-public class PDFSuffixInterleaver {
+public class FocalPointProjectReviewPDFCompiler {
 
-  public static void interleaveSuffixSeparateAndSave(File suffix, File document,
+  public static void compilePDF(
+      File focalPointDocumentFile,
+      File projectReviewPageFile,
       File outputDirectory) throws IOException {
-    PDDocument suffixPage = PDDocument.load(suffix);
-    PDDocument mainDoc = PDDocument.load(document);
+
+    PDDocument focalPointDocument = PDDocument.load(focalPointDocumentFile);
+    PDDocument projectReviewPage = PDDocument.load(projectReviewPageFile);
+
+    // TODO:
 
     Splitter splitter = new Splitter();
-    PDFNamer pdfNamer = new NoOverwritePDFNamer(new PaprikaProjectPDFNamer(), outputDirectory);
+    PDFNamer pdfNamer = new NoOverwritePDFNamer(new FocalPointProjectReviewPDFNamer(), outputDirectory);
 
     List<PDDocument> pages = splitter.split(mainDoc);
 
@@ -42,9 +47,8 @@ public class PDFSuffixInterleaver {
     mainDoc.close();
   }
 
-  public static void interleaveSuffixSeparateAndSave(File suffix, File document)
-      throws IOException {
-    interleaveSuffixSeparateAndSave(suffix, document, new File("").getAbsoluteFile());
+  public static void compilePDF(File suffix, File document) throws IOException {
+    compilePDF(suffix, document, new File("").getAbsoluteFile());
   }
 
 }

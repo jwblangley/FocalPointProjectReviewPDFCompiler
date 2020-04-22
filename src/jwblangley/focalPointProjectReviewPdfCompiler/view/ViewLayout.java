@@ -35,6 +35,8 @@ public class ViewLayout {
   public Pane layout(Stage window) {
     Font font = new Font(18);
 
+    // TODO:
+
     BorderPane rootNode = new BorderPane();
 
     HBox buttonLayout = new HBox(5);
@@ -71,7 +73,7 @@ public class ViewLayout {
     goButton.setPrefSize(WIDTH / 4, HEIGHT);
     goButton.setFont(font);
     goButton.setTextAlignment(TextAlignment.CENTER);
-    goButton.setOnAction(e -> controller.runInterleaver());
+    goButton.setOnAction(e -> controller.runPDFCompiler());
 
     buttonLayout.getChildren().addAll(
         selectDocumentButton,
@@ -110,9 +112,9 @@ public class ViewLayout {
     File chosenFile = fc.showOpenDialog(source.getScene().getWindow());
 
     if (source == selectSuffixButton) {
-      controller.setSuffixPdf(chosenFile);
+      controller.setProjectReviewPage(chosenFile);
     } else if (source == selectDocumentButton) {
-      controller.setDocumentPdf(chosenFile);
+      controller.setFocalPointDocument(chosenFile);
     } else {
       throw new UnsupportedOperationException("Unexpected Button Press");
     }

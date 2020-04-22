@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
-public class PaprikaProjectPDFNamer implements PDFNamer {
+public class FocalPointProjectReviewPDFNamer implements PDFNamer {
 
   private static final String FALLBACK_NAME = "paprika-file.pdf";
 
@@ -25,6 +25,9 @@ public class PaprikaProjectPDFNamer implements PDFNamer {
   public String namePDF(PDDocument document) {
     // N.B: does not close document
     try {
+
+      // TODO:
+
       PDFTextStripper textStripper = new PDFTextStripper();
       String pdfContent = textStripper.getText(document);
 
@@ -42,20 +45,8 @@ public class PaprikaProjectPDFNamer implements PDFNamer {
         Matcher projectManagerMatcher
             = Pattern.compile(codeInjectedProjectManagerEx).matcher(pdfContent);
 
-        List<String> listedManagers = new ArrayList<>();
-        while (projectManagerMatcher.find()) {
-          listedManagers.add(projectManagerMatcher.group(1));
-        }
-
-        if (listedManagers.isEmpty()) {
-          // No match for project managers
-          return FALLBACK_NAME;
-        }
-
-        String projectManager = mode(listedManagers);
-
         // If all succeeds - return result
-        return String.format("%s-%s-%s.pdf", projectManager, projectCodeMatch, dateMatch);
+        return String.format("%s-%s.pdf", projectCodeMatch, dateMatch);
 
       } else {
         // No match for project code or date
@@ -65,25 +56,5 @@ public class PaprikaProjectPDFNamer implements PDFNamer {
       e.printStackTrace();
       return FALLBACK_NAME;
     }
-  }
-
-  private <T> T mode(List<T> items) {
-    Map<T, Integer> countMap = new HashMap<>();
-
-    int max = 0;
-    T result = null;
-    for (T item : items) {
-      if (!countMap.containsKey(item)) {
-        countMap.put(item, 1);
-      } else {
-        countMap.put(item, countMap.get(item) + 1);
-      }
-
-      if (countMap.get(item) > max) {
-        max = countMap.get(item);
-        result = item;
-      }
-    }
-    return result;
   }
 }

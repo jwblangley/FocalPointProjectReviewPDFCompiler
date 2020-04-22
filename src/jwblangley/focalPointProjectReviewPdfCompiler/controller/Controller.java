@@ -1,12 +1,10 @@
 package jwblangley.focalPointProjectReviewPdfCompiler.controller;
 
 import java.io.File;
-import java.io.IOException;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import jwblangley.focalPointProjectReviewPdfCompiler.model.PDFSuffixInterleaver;
 import jwblangley.focalPointProjectReviewPdfCompiler.view.ViewLayout;
 
 public class Controller extends Application {
@@ -15,29 +13,29 @@ public class Controller extends Application {
 
   private ViewLayout layout;
 
-  private File documentPdf;
-  private File suffixPdf;
+  private File focalPointDocument;
+  private File projectReviewPage;
   private File outputDirectory;
 
-  public void setDocumentPdf(File documentPdf) {
-    this.documentPdf = documentPdf;
+  public void setFocalPointDocument(File focalPointDocument) {
+    this.focalPointDocument = focalPointDocument;
   }
 
-  public void setSuffixPdf(File suffixPdf) {
-    this.suffixPdf = suffixPdf;
+  public void setProjectReviewPage(File projectReviewPage) {
+    this.projectReviewPage = projectReviewPage;
   }
 
   public void setOutputDirectory(File outputDirectory) {
     this.outputDirectory = outputDirectory;
   }
 
-  public void runInterleaver() {
-    if (suffixPdf == null) {
-      layout.reportStatus("Please select a project review pdf", false);
+  public void runPDFCompiler() {
+    if (focalPointDocument == null) {
+      layout.reportStatus("Please select a FocalPoint output pdf", false);
       return;
     }
-    if (documentPdf == null) {
-      layout.reportStatus("Please select a Paprika pdf", false);
+    if (projectReviewPage == null) {
+      layout.reportStatus("Please select a project review page pdf", false);
       return;
     }
     if (outputDirectory == null) {
@@ -46,14 +44,9 @@ public class Controller extends Application {
     }
     layout.reportStatus("Working...", true);
     new Thread(() -> {
-      try {
-        PDFSuffixInterleaver
-            .interleaveSuffixSeparateAndSave(suffixPdf, documentPdf, outputDirectory);
-        Platform.runLater(() -> layout.reportStatus("Process complete", true));
-      } catch (IOException e) {
-        e.printStackTrace();
-        Platform.runLater(() -> layout.reportStatus("An error occurred", false));
-      }
+      // TODO: Run model
+
+      Platform.runLater(() -> layout.reportStatus("Process complete", true));
     }).start();
 
   }
