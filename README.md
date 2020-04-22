@@ -1,6 +1,8 @@
-# Project Review PDF Compiler
+# FocalPoint Project Review PDF Compiler
 
-Utility to interleave project review files after each page of paprika output documents.
+Utility to compile FocalPoint project review documents
 
 ## Requries:
 org.apache.pdfbox:pdfbox:2.0.13
+
+#### This project was forked from jwblangley/PDFSuffixInterleaver
