@@ -23,8 +23,8 @@ public class ViewLayout {
 
   private final Controller controller;
 
-  private Button selectSuffixButton;
-  private Button selectDocumentButton;
+  private Button setFocalPointDocButton;
+  private Button setProjectReviewPageButton;
 
   private Label statusLabel;
 
@@ -35,26 +35,24 @@ public class ViewLayout {
   public Pane layout(Stage window) {
     Font font = new Font(18);
 
-    // TODO:
-
     BorderPane rootNode = new BorderPane();
 
     HBox buttonLayout = new HBox(5);
     buttonLayout.setPrefSize(WIDTH, HEIGHT);
 
-    selectDocumentButton = new Button("Select Paprika file");
-    selectDocumentButton.setPrefSize(WIDTH / 4, HEIGHT);
-    selectDocumentButton.setFont(font);
-    selectDocumentButton.wrapTextProperty().setValue(true);
-    selectDocumentButton.setTextAlignment(TextAlignment.CENTER);
-    selectDocumentButton.setOnAction(this::handleSelectFileButton);
+    setFocalPointDocButton = new Button("Select FocalPoint file");
+    setFocalPointDocButton.setPrefSize(WIDTH / 4, HEIGHT);
+    setFocalPointDocButton.setFont(font);
+    setFocalPointDocButton.wrapTextProperty().setValue(true);
+    setFocalPointDocButton.setTextAlignment(TextAlignment.CENTER);
+    setFocalPointDocButton.setOnAction(this::handleSelectFileButton);
 
-    selectSuffixButton = new Button("Select Project Review file");
-    selectSuffixButton.setPrefSize(WIDTH / 4, HEIGHT);
-    selectSuffixButton.setFont(font);
-    selectSuffixButton.wrapTextProperty().setValue(true);
-    selectSuffixButton.setTextAlignment(TextAlignment.CENTER);
-    selectSuffixButton.setOnAction(this::handleSelectFileButton);
+    setProjectReviewPageButton = new Button("Select Project Review file");
+    setProjectReviewPageButton.setPrefSize(WIDTH / 4, HEIGHT);
+    setProjectReviewPageButton.setFont(font);
+    setProjectReviewPageButton.wrapTextProperty().setValue(true);
+    setProjectReviewPageButton.setTextAlignment(TextAlignment.CENTER);
+    setProjectReviewPageButton.setOnAction(this::handleSelectFileButton);
 
     Button selectOutputDirButton = new Button("Select Output Directory");
     selectOutputDirButton.setPrefSize(WIDTH / 4, HEIGHT);
@@ -76,8 +74,8 @@ public class ViewLayout {
     goButton.setOnAction(e -> controller.runPDFCompiler());
 
     buttonLayout.getChildren().addAll(
-        selectDocumentButton,
-        selectSuffixButton,
+        setFocalPointDocButton,
+        setProjectReviewPageButton,
         selectOutputDirButton,
         goButton
     );
@@ -101,9 +99,9 @@ public class ViewLayout {
     Button source = (Button) e.getSource();
 
     FileChooser fc = new FileChooser();
-    fc.setTitle(source == selectSuffixButton
-        ? "Select project review file"
-        : "Select Paprika file"
+    fc.setTitle(source == setFocalPointDocButton
+        ? "Select FocalPoint file"
+        : "Select Project Review file"
     );
 
     ExtensionFilter pdfFilter = new ExtensionFilter("PDF Documents", "*.pdf");
@@ -111,10 +109,10 @@ public class ViewLayout {
 
     File chosenFile = fc.showOpenDialog(source.getScene().getWindow());
 
-    if (source == selectSuffixButton) {
-      controller.setProjectReviewPage(chosenFile);
-    } else if (source == selectDocumentButton) {
+    if (source == setFocalPointDocButton) {
       controller.setFocalPointDocument(chosenFile);
+    } else if (source == setProjectReviewPageButton) {
+      controller.setProjectReviewPage(chosenFile);
     } else {
       throw new UnsupportedOperationException("Unexpected Button Press");
     }
