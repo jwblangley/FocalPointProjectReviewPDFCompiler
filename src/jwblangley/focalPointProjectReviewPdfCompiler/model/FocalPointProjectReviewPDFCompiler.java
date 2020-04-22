@@ -2,7 +2,10 @@ package jwblangley.focalPointProjectReviewPdfCompiler.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.NoOverwritePDFNamer;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.PDFNamer;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.FocalPointProjectReviewPDFNamer;
@@ -12,6 +15,10 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 
 public class FocalPointProjectReviewPDFCompiler {
 
+  public static void compilePDF(File suffix, File document) throws IOException {
+    compilePDF(suffix, document, new File("").getAbsoluteFile());
+  }
+
   public static void compilePDF(
       File focalPointDocumentFile,
       File projectReviewPageFile,
@@ -20,35 +27,49 @@ public class FocalPointProjectReviewPDFCompiler {
     PDDocument focalPointDocument = PDDocument.load(focalPointDocumentFile);
     PDDocument projectReviewPage = PDDocument.load(projectReviewPageFile);
 
-    // TODO:
-
     Splitter splitter = new Splitter();
     PDFNamer pdfNamer = new NoOverwritePDFNamer(new FocalPointProjectReviewPDFNamer(), outputDirectory);
 
-    List<PDDocument> pages = splitter.split(mainDoc);
+    List<PDDocument> pages = splitter.split(focalPointDocument);
+
+    Queue<PDDocument> pageQueue = new LinkedList<>();
 
     for (PDDocument page : pages) {
-      PDFMergerUtility merger = new PDFMergerUtility();
+      pageQueue.add(page);
 
-      PDDocument resultDoc = new PDDocument();
-
-      merger.appendDocument(resultDoc, page);
-      merger.appendDocument(resultDoc, suffixPage);
-
-      File resultFile = new File(outputDirectory, pdfNamer.namePDF(resultDoc));
-
-      resultDoc.save(resultFile.getPath());
-      resultDoc.close();
-      page.close();
+      if (endOfSectionAt(page)) {
+        compileSection(pageQueue, projectReviewPage);
+        assert pageQueue.isEmpty(): "compileSection must consume all pages on the page queue";
+      }
     }
 
+    assert pageQueue.isEmpty(): "Not all pages were consumed from the queue";
+
     // Close documents
-    suffixPage.close();
-    mainDoc.close();
+    focalPointDocument.close();
+    projectReviewPage.close();
   }
 
-  public static void compilePDF(File suffix, File document) throws IOException {
-    compilePDF(suffix, document, new File("").getAbsoluteFile());
+  private static boolean endOfSectionAt(PDDocument page) {
+    // TODO
+    return false;
   }
+
+  private static void compileSection(Queue<PDDocument> pageQueue, PDDocument projectReviewPage) {
+    // TODO
+//    PDFMergerUtility merger = new PDFMergerUtility();
+//
+//    PDDocument resultDoc = new PDDocument();
+//
+//    merger.appendDocument(resultDoc, page);
+//    merger.appendDocument(resultDoc, suffixPage);
+//
+//    File resultFile = new File(outputDirectory, pdfNamer.namePDF(resultDoc));
+//
+//    resultDoc.save(resultFile.getPath());
+//    resultDoc.close();
+//    page.close();
+  }
+
 
 }

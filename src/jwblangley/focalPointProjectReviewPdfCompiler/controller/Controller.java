@@ -58,7 +58,7 @@ public class Controller extends Application {
         FocalPointProjectReviewPDFCompiler.compilePDF(focalPointDocument, projectReviewPage, outputDirectory);
         Platform.runLater(() -> layout.reportStatus("Process complete", true));
       } catch (IOException e) {
-        Platform.runLater(() -> layout.reportStatus("An error occured", false));
+        Platform.runLater(() -> layout.reportStatus("An error occurred", false));
         e.printStackTrace();
       }
     }).start();
