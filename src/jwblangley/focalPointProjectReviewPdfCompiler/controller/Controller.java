@@ -1,10 +1,12 @@
 package jwblangley.focalPointProjectReviewPdfCompiler.controller;
 
 import java.io.File;
+import java.io.IOException;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import jwblangley.focalPointProjectReviewPdfCompiler.model.FocalPointProjectReviewPDFCompiler;
 import jwblangley.focalPointProjectReviewPdfCompiler.view.ViewLayout;
 
 public class Controller extends Application {
@@ -29,24 +31,36 @@ public class Controller extends Application {
     this.outputDirectory = outputDirectory;
   }
 
-  public void runPDFCompiler() {
+  public boolean validateInputs() {
     if (focalPointDocument == null) {
       layout.reportStatus("Please select a FocalPoint output pdf", false);
-      return;
+      return false;
     }
     if (projectReviewPage == null) {
       layout.reportStatus("Please select a project review page pdf", false);
-      return;
+      return false;
     }
     if (outputDirectory == null) {
       layout.reportStatus("Please select an output directory", false);
+      return false;
+    }
+    return true;
+  }
+
+  public void runPDFCompiler() {
+    if (!validateInputs()) {
       return;
     }
+
     layout.reportStatus("Working...", true);
     new Thread(() -> {
-      // TODO: Run model
-
-      Platform.runLater(() -> layout.reportStatus("Process complete", true));
+      try {
+        FocalPointProjectReviewPDFCompiler.compilePDF(focalPointDocument, projectReviewPage, outputDirectory);
+        Platform.runLater(() -> layout.reportStatus("Process complete", true));
+      } catch (IOException e) {
+        Platform.runLater(() -> layout.reportStatus("An error occured", false));
+        e.printStackTrace();
+      }
     }).start();
 
   }
