@@ -11,7 +11,7 @@ import jwblangley.focalPointProjectReviewPdfCompiler.view.ViewLayout;
 
 public class Controller extends Application {
 
-  private static final String VERSION = "v2.2.0";
+  private static final String VERSION = "v0.0.0";
 
   private ViewLayout layout;
 
@@ -63,7 +63,7 @@ public class Controller extends Application {
     layout = new ViewLayout(this);
     Scene scene = new Scene(layout.layout(stage));
 
-    stage.setTitle("Project Review PDF Compiler - " + VERSION);
+    stage.setTitle("FocalPoint Project Review PDF Compiler - " + VERSION);
     stage.setScene(scene);
     stage.centerOnScreen();
     stage.show();
