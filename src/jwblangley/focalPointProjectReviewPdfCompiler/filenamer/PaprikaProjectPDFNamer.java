@@ -1,4 +1,4 @@
-package jwblangley.pdfSuffixInterleaver.filenamer;
+package jwblangley.focalPointProjectReviewPdfCompiler.filenamer;
 
 import java.io.IOException;
 import java.util.ArrayList;

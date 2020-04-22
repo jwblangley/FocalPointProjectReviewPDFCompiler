@@ -1,4 +1,4 @@
-package jwblangley.pdfSuffixInterleaver.controller;
+package jwblangley.focalPointProjectReviewPdfCompiler.controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,8 +6,8 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import jwblangley.pdfSuffixInterleaver.model.PDFSuffixInterleaver;
-import jwblangley.pdfSuffixInterleaver.view.ViewLayout;
+import jwblangley.focalPointProjectReviewPdfCompiler.model.PDFSuffixInterleaver;
+import jwblangley.focalPointProjectReviewPdfCompiler.view.ViewLayout;
 
 public class Controller extends Application {
 

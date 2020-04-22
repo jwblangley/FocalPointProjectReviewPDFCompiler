@@ -1,11 +1,11 @@
-package jwblangley.pdfSuffixInterleaver.model;
+package jwblangley.focalPointProjectReviewPdfCompiler.model;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import jwblangley.pdfSuffixInterleaver.filenamer.NoOverwritePDFNamer;
-import jwblangley.pdfSuffixInterleaver.filenamer.PDFNamer;
-import jwblangley.pdfSuffixInterleaver.filenamer.PaprikaProjectPDFNamer;
+import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.NoOverwritePDFNamer;
+import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.PDFNamer;
+import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.PaprikaProjectPDFNamer;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;

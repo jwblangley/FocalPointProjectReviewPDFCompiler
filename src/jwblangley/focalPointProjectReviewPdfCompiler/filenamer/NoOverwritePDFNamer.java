@@ -1,4 +1,4 @@
-package jwblangley.pdfSuffixInterleaver.filenamer;
+package jwblangley.focalPointProjectReviewPdfCompiler.filenamer;
 
 import java.io.File;
 import org.apache.pdfbox.pdmodel.PDDocument;
