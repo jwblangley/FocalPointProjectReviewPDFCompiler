@@ -24,7 +24,9 @@ public class FocalPointProjectReviewPDFCompiler {
   private static final String PROJECT_CODE_EX = "Project\\s*?Review\\s*?(.+?)\\s";
   private static final String PROJECT_CODE_LABEL = "Project code";
 
-
+  // N.B: might be left blank
+  private static final String ESTIMATED_PROJECT_VALUE_EX = "Project\\s*?Manager:\\s+?(.*)$";
+  private static final String ESTIMATED_PROJECT_VALUE_LABEL = "Estimated total";
 
   public static void compilePDF(File suffix, File document) throws IOException {
     compilePDF(suffix, document, new File("").getAbsoluteFile());
@@ -82,10 +84,11 @@ public class FocalPointProjectReviewPDFCompiler {
     PDFTextStripper textStripper = new PDFTextStripper();
 
     // Extract information from first page
-    // First page will always be existing project review page
     PDDocument firstPage = pageQueue.poll();
-
     String firstPageContent = textStripper.getText(firstPage);
+
+    System.out.println(firstPageContent);
+    System.out.println("---------------------1/2----------------------------");
 
     // Project code
     Matcher projectCodeMatcher = Pattern.compile(PROJECT_CODE_EX).matcher(firstPageContent);
@@ -94,9 +97,12 @@ public class FocalPointProjectReviewPDFCompiler {
     String projectCodeMatch = projectCodeMatcher.group(1);
     extractedInformation.put(PROJECT_CODE_LABEL, projectCodeMatch);
 
-
-    System.out.println(firstPageContent);
-    System.out.println("---------------------1/2----------------------------");
+    // Project code
+    Matcher estimatedProjectValueMatcher = Pattern.compile(ESTIMATED_PROJECT_VALUE_EX, Pattern.MULTILINE).matcher(firstPageContent);
+    // TODO: error handle
+    estimatedProjectValueMatcher.find();
+    String estimatedProjectValueMatch = estimatedProjectValueMatcher.group(1);
+    extractedInformation.put(ESTIMATED_PROJECT_VALUE_LABEL, estimatedProjectValueMatch);
 
     PDDocument secondPage = pageQueue.poll();
     String secondPageContent = textStripper.getText(secondPage);
