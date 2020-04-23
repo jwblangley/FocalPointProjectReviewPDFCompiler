@@ -67,22 +67,38 @@ public class FocalPointProjectReviewPDFCompiler {
       PDDocument projectReviewPage,
       File outputDirectory) throws IOException {
 
+    assert pageQueue.size() >= 2;
+
     PDFMergerUtility merger = new PDFMergerUtility();
     PDDocument resultDoc = new PDDocument();
 
-    // First page will always be existing project review page TODO: check
-    PDDocument frontPage = pageQueue.poll();
-
-    // Extract information from page
+    // Extract information from first two pages
     Map<String, String> extractedInformation = new HashMap<>();
+    PDFTextStripper textStripper = new PDFTextStripper();
 
-    // TODO
+    // Extract information from first page
+    // First page will always be existing project review page
+    PDDocument firstPage = pageQueue.poll();
 
-    // Replace first page
-    PDDocument filledPVPage = fillProjectReviewPage(projectReviewPage, extractedInformation);
+    String firstPageContent = textStripper.getText(firstPage);
+
+    System.out.println(firstPageContent);
+    System.out.println("---------------------1/2----------------------------");
+
+    PDDocument secondPage = pageQueue.poll();
+    String secondPageContent = textStripper.getText(secondPage);
+
+    System.out.println(secondPageContent);
+    System.out.println("---------------------2/2----------------------------");
+
+
+    // Replace first
+//    PDDocument filledPVPage = fillProjectReviewPage(projectReviewPage, extractedInformation);
 //    merger.appendDocument(resultDoc, filledPVPage);
 //    filledPVPage.close();
-    frontPage.close();
+    firstPage.close();
+
+
 
     // Read from pageQueue
     while (!pageQueue.isEmpty()) {
@@ -102,7 +118,7 @@ public class FocalPointProjectReviewPDFCompiler {
 
   private static PDDocument fillProjectReviewPage(PDDocument projectReviewPage, Map<String, String> formFields) {
     // TODO
-    return null;
+    return projectReviewPage;
   }
 
 
