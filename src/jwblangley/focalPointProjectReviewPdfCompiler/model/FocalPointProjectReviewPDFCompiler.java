@@ -25,8 +25,15 @@ public class FocalPointProjectReviewPDFCompiler {
   private static final String PROJECT_CODE_LABEL = "Project code";
 
   // N.B: might be left blank
-  private static final String ESTIMATED_PROJECT_VALUE_EX = "Project\\s*?Manager:\\s+?(.*)$";
+  private static final String ESTIMATED_PROJECT_VALUE_EX
+      = "Project\\s*?Manager:\\s*?$\\s*(.*?)$?\\s*.+?$\\s*.+?$\\s*Project\\s*?title";
   private static final String ESTIMATED_PROJECT_VALUE_LABEL = "Estimated total";
+
+  private static final String INVOICED_TO_DATE_AND_CURRENT_PROJECT_POSITION_EX
+      = "Project\\s*?title:\\s*?$\\s*(.*?)$\\s*(.*?)$";
+  private static final String INVOICED_TO_DATE_LABEL = "Estimated total";
+  private static final String CURRENT_PROJECT_POSITION_LABEL = "Estimated total";
+
 
   public static void compilePDF(File suffix, File document) throws IOException {
     compilePDF(suffix, document, new File("").getAbsoluteFile());
@@ -97,12 +104,23 @@ public class FocalPointProjectReviewPDFCompiler {
     String projectCodeMatch = projectCodeMatcher.group(1);
     extractedInformation.put(PROJECT_CODE_LABEL, projectCodeMatch);
 
-    // Project code
+    // Estimated Project Value
     Matcher estimatedProjectValueMatcher = Pattern.compile(ESTIMATED_PROJECT_VALUE_EX, Pattern.MULTILINE).matcher(firstPageContent);
     // TODO: error handle
     estimatedProjectValueMatcher.find();
     String estimatedProjectValueMatch = estimatedProjectValueMatcher.group(1);
     extractedInformation.put(ESTIMATED_PROJECT_VALUE_LABEL, estimatedProjectValueMatch);
+
+    // Invoiced to date and current project position
+    Matcher invoicedToDateAndCurrentProjectPositionMatcher
+        = Pattern.compile(INVOICED_TO_DATE_AND_CURRENT_PROJECT_POSITION_EX, Pattern.MULTILINE).matcher(firstPageContent);
+    // TODO: error handle
+    invoicedToDateAndCurrentProjectPositionMatcher.find();
+    String invoicedToDate = invoicedToDateAndCurrentProjectPositionMatcher.group(1);
+    String currentProjectPosition = invoicedToDateAndCurrentProjectPositionMatcher.group(2);
+    extractedInformation.put(INVOICED_TO_DATE_LABEL, invoicedToDate);
+    extractedInformation.put(CURRENT_PROJECT_POSITION_LABEL, currentProjectPosition);
+
 
     PDDocument secondPage = pageQueue.poll();
     String secondPageContent = textStripper.getText(secondPage);
