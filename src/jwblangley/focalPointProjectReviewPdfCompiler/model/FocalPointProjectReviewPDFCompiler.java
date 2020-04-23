@@ -21,6 +21,11 @@ public class FocalPointProjectReviewPDFCompiler {
 
   private static final String END_OF_SECTION_TOKEN = "Sub Total Project";
 
+  private static final String PROJECT_CODE_EX = "Project\\s*?Review\\s*?(.+?)\\s";
+  private static final String PROJECT_CODE_LABEL = "Project code";
+
+
+
   public static void compilePDF(File suffix, File document) throws IOException {
     compilePDF(suffix, document, new File("").getAbsoluteFile());
   }
@@ -81,6 +86,14 @@ public class FocalPointProjectReviewPDFCompiler {
     PDDocument firstPage = pageQueue.poll();
 
     String firstPageContent = textStripper.getText(firstPage);
+
+    // Project code
+    Matcher projectCodeMatcher = Pattern.compile(PROJECT_CODE_EX).matcher(firstPageContent);
+    // TODO: error handle
+    projectCodeMatcher.find();
+    String projectCodeMatch = projectCodeMatcher.group(1);
+    extractedInformation.put(PROJECT_CODE_LABEL, projectCodeMatch);
+
 
     System.out.println(firstPageContent);
     System.out.println("---------------------1/2----------------------------");
