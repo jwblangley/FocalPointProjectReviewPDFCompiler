@@ -94,9 +94,6 @@ public class FocalPointProjectReviewPDFCompiler {
     PDDocument firstPage = pageQueue.poll();
     String firstPageContent = textStripper.getText(firstPage);
 
-    System.out.println(firstPageContent);
-    System.out.println("---------------------1/2----------------------------");
-
     // Project code
     Matcher projectCodeMatcher = Pattern.compile(PROJECT_CODE_EX).matcher(firstPageContent);
     // TODO: error handle
@@ -121,12 +118,12 @@ public class FocalPointProjectReviewPDFCompiler {
     extractedInformation.put(INVOICED_TO_DATE_LABEL, invoicedToDate);
     extractedInformation.put(CURRENT_PROJECT_POSITION_LABEL, currentProjectPosition);
 
-
+    // Extract information from second page
     PDDocument secondPage = pageQueue.poll();
     String secondPageContent = textStripper.getText(secondPage);
 
     System.out.println(secondPageContent);
-    System.out.println("---------------------2/2----------------------------");
+    System.out.println("-------------------------------------------------");
 
 
     // Replace first
