@@ -2,17 +2,24 @@ package jwblangley.focalPointProjectReviewPdfCompiler.model;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.NoOverwritePDFNamer;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.PDFNamer;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.StringPDFNamer;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 
 public class FocalPointProjectReviewPDFCompiler {
+
+  private static final String END_OF_SECTION_TOKEN = "Sub Total Project";
 
   public static void compilePDF(File suffix, File document) throws IOException {
     compilePDF(suffix, document, new File("").getAbsoluteFile());
@@ -47,9 +54,12 @@ public class FocalPointProjectReviewPDFCompiler {
     projectReviewPage.close();
   }
 
-  private static boolean endOfSectionAt(PDDocument page) {
-    // TODO
-    return false;
+  private static boolean endOfSectionAt(PDDocument page) throws IOException {
+    PDFTextStripper textStripper = new PDFTextStripper();
+    String pageContent = textStripper.getText(page);
+
+    Matcher endTokenMatcher = Pattern.compile(END_OF_SECTION_TOKEN).matcher(pageContent);
+    return endTokenMatcher.find();
   }
 
   private static void compileSection(
@@ -62,12 +72,16 @@ public class FocalPointProjectReviewPDFCompiler {
 
     // First page will always be existing project review page TODO: check
     PDDocument frontPage = pageQueue.poll();
+
     // Extract information from page
+    Map<String, String> extractedInformation = new HashMap<>();
+
+    // TODO
 
     // Replace first page
-    PDDocument filledPVPage = fillProjectReviewPage(projectReviewPage);
-    merger.appendDocument(resultDoc, filledPVPage);
-    filledPVPage.close();
+    PDDocument filledPVPage = fillProjectReviewPage(projectReviewPage, extractedInformation);
+//    merger.appendDocument(resultDoc, filledPVPage);
+//    filledPVPage.close();
     frontPage.close();
 
     // Read from pageQueue
@@ -77,7 +91,7 @@ public class FocalPointProjectReviewPDFCompiler {
       page.close();
     }
 
-    String resultName = "";
+    String resultName = "testOutput.pdf";
     PDFNamer pdfNamer = new NoOverwritePDFNamer(new StringPDFNamer(resultName), outputDirectory);
 
     File resultFile = new File(outputDirectory, pdfNamer.namePDF(resultDoc));
@@ -86,7 +100,7 @@ public class FocalPointProjectReviewPDFCompiler {
     resultDoc.close();
   }
 
-  private static PDDocument fillProjectReviewPage(PDDocument projectReviewPage) {
+  private static PDDocument fillProjectReviewPage(PDDocument projectReviewPage, Map<String, String> formFields) {
     // TODO
     return null;
   }
