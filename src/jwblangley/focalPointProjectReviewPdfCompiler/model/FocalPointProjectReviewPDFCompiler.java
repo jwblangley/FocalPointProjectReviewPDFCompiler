@@ -53,7 +53,6 @@ public class FocalPointProjectReviewPDFCompiler {
   private static final String BUDGET_POSITION_VALUE_LABEL = "Budget position value";
   private static final String BUDGET_POSITION_TEXT_LABEL = "Budget position text";
 
-
   // Second page expressions and labels
   private static final String PROJECT_TITLE_EX = "Project:\\s*(.+?)\\s*Director";
   private static final String PROJECT_TITLE_LABEL = "Project title";
@@ -85,11 +84,11 @@ public class FocalPointProjectReviewPDFCompiler {
       if (endOfSectionAt(page)) {
         // N.B: Order of the operands is important as we always want to compileSection
         allSucceed = compileSection(pageQueue, projectReviewPage, outputDirectory) && allSucceed;
-        assert pageQueue.isEmpty(): "compileSection must consume all pages on the page queue";
+        assert pageQueue.isEmpty() : "compileSection must consume all pages on the page queue";
       }
     }
 
-    assert pageQueue.isEmpty(): "Not all pages were consumed from the queue";
+    assert pageQueue.isEmpty() : "Not all pages were consumed from the queue";
 
     // Close documents
     focalPointDocument.close();
@@ -159,7 +158,9 @@ public class FocalPointProjectReviewPDFCompiler {
 
     String showProblem = allExtractionSuccess ? "" : INDICATES_PROBLEM;
 
-    String resultName = String.format("%s%s-%s-%s.pdf", showProblem, projectManager, projectCode, date);
+    String resultName = String.format("%s%s-%s-%s.pdf",
+        showProblem, projectManager, projectCode, date);
+
     PDFNamer pdfNamer = new NoOverwritePDFNamer(new StringPDFNamer(resultName), outputDirectory);
 
     File resultFile = new File(outputDirectory, pdfNamer.namePDF(resultDoc));
@@ -204,8 +205,8 @@ public class FocalPointProjectReviewPDFCompiler {
     if (!internalProjectReview) {
 
       // Estimated Project Value and Profit or Overrun
-      Matcher epvAndPorOMatcher = Pattern.compile(EPV_AND_PorO_EX, Pattern.MULTILINE)
-          .matcher(firstPageContent);
+      Matcher epvAndPorOMatcher
+          = Pattern.compile(EPV_AND_PorO_EX, Pattern.MULTILINE).matcher(firstPageContent);
 
       if (!epvAndPorOMatcher.find()) {
         allSucceed = false;
@@ -217,23 +218,25 @@ public class FocalPointProjectReviewPDFCompiler {
       }
 
       // Invoiced to date and current project position
-      Matcher invoicedToDateAndCurrentProjectPositionMatcher
-          = Pattern.compile(INVOICED_TO_DATE_AND_CURRENT_PROJECT_POSITION_EX, Pattern.MULTILINE)
+      Matcher invoicedToDateAndCurrentProjectPositionMatcher = Pattern
+          .compile(INVOICED_TO_DATE_AND_CURRENT_PROJECT_POSITION_EX, Pattern.MULTILINE)
           .matcher(firstPageContent);
 
       if (!invoicedToDateAndCurrentProjectPositionMatcher.find()) {
         allSucceed = false;
       } else {
         String invoicedToDateMatch = invoicedToDateAndCurrentProjectPositionMatcher.group(1);
-        String currentProjectPositionMatch = invoicedToDateAndCurrentProjectPositionMatcher.group(2);
+        String currentProjectPositionMatch = invoicedToDateAndCurrentProjectPositionMatcher
+            .group(2);
         extractionMap.put(INVOICED_TO_DATE_LABEL, invoicedToDateMatch);
         extractionMap.put(CURRENT_PROJECT_POSITION_LABEL, currentProjectPositionMatch);
       }
 
     } else {
       // Internal Project Review
-      Matcher internalProjectReviewMatcher
-          = Pattern.compile(INTERNAL_PROJECT_REVIEW_EX, Pattern.MULTILINE).matcher(firstPageContent);
+      Matcher internalProjectReviewMatcher = Pattern
+          .compile(INTERNAL_PROJECT_REVIEW_EX, Pattern.MULTILINE)
+          .matcher(firstPageContent);
 
       if (!internalProjectReviewMatcher.find()) {
         allSucceed = false;
@@ -264,7 +267,10 @@ public class FocalPointProjectReviewPDFCompiler {
     }
 
     // Project Director
-    Matcher projectDirectorMatcher = Pattern.compile(PROJECT_DIRECTOR_EX).matcher(secondPageContent);
+    Matcher projectDirectorMatcher = Pattern
+        .compile(PROJECT_DIRECTOR_EX)
+        .matcher(secondPageContent);
+
     if (!projectDirectorMatcher.find()) {
       allSucceed = false;
     } else {
@@ -273,7 +279,10 @@ public class FocalPointProjectReviewPDFCompiler {
     }
 
     // Project Manager
-    Matcher projectManagerMatcher = Pattern.compile(PROJECT_MANAGER_EX, Pattern.MULTILINE).matcher(secondPageContent);
+    Matcher projectManagerMatcher = Pattern
+        .compile(PROJECT_MANAGER_EX, Pattern.MULTILINE)
+        .matcher(secondPageContent);
+
     if (!projectManagerMatcher.find()) {
       allSucceed = false;
     } else {
@@ -284,8 +293,9 @@ public class FocalPointProjectReviewPDFCompiler {
     return allSucceed;
   }
 
-  private static PDDocument fillProjectReviewPage(PDDocument projectReviewPage, Map<String, String> formFields)
-      throws IOException {
+  private static PDDocument fillProjectReviewPage(
+      PDDocument projectReviewPage, Map<String, String> formFields) throws IOException {
+
     // Clone projectReviewPage into filledProjectReviewPage
     PDDocument filledProjectReviewPage = new PDDocument();
     PDFMergerUtility merger = new PDFMergerUtility();
