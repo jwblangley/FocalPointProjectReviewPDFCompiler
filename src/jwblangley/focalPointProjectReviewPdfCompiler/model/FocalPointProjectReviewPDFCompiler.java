@@ -110,99 +110,16 @@ public class FocalPointProjectReviewPDFCompiler {
     PDDocument resultDoc = new PDDocument();
 
     // Extract information from first two pages
-    Map<String, String> extractedInformation = new HashMap<>();
-    PDFTextStripper textStripper = new PDFTextStripper();
-
-    // Extract information from first page
     PDDocument firstPage = pageQueue.poll();
-    String firstPageContent = textStripper.getText(firstPage);
-
-    final boolean internalProjectReview = firstPageContent.startsWith("Internal");
-
-    // Project code
-    Matcher projectCodeMatcher = Pattern.compile(PROJECT_CODE_EX).matcher(firstPageContent);
-    // TODO: error handle
-    projectCodeMatcher.find();
-    String projectCodeMatch = projectCodeMatcher.group(1);
-    extractedInformation.put(PROJECT_CODE_LABEL, projectCodeMatch);
-
-    // Date
-    Matcher dateMatcher = Pattern.compile(DATE_EX).matcher(firstPageContent);
-    // TODO: error handle
-    dateMatcher.find();
-    String dateMatch = dateMatcher.group(1);
-    extractedInformation.put(DATE_LABEL, dateMatch);
-
-    if (!internalProjectReview) {
-      // Estimated Project Value and Profit or Overrun
-      Matcher epvAndPorOMatcher = Pattern.compile(EPV_AND_PorO_EX, Pattern.MULTILINE)
-          .matcher(firstPageContent);
-      // TODO: error handle
-      epvAndPorOMatcher.find();
-      String estimatedProjectValueMatch = epvAndPorOMatcher.group(1);
-      String profitOrOverrunMatch = epvAndPorOMatcher.group(2);
-      extractedInformation.put(ESTIMATED_PROJECT_VALUE_LABEL, estimatedProjectValueMatch);
-      extractedInformation.put(PROFIT_OR_OVERRUN_LABEL, profitOrOverrunMatch);
-
-      // Invoiced to date and current project position
-      Matcher invoicedToDateAndCurrentProjectPositionMatcher
-          = Pattern.compile(INVOICED_TO_DATE_AND_CURRENT_PROJECT_POSITION_EX, Pattern.MULTILINE)
-          .matcher(firstPageContent);
-      // TODO: error handle
-      invoicedToDateAndCurrentProjectPositionMatcher.find();
-      String invoicedToDate = invoicedToDateAndCurrentProjectPositionMatcher.group(1);
-      String currentProjectPosition = invoicedToDateAndCurrentProjectPositionMatcher.group(2);
-      extractedInformation.put(INVOICED_TO_DATE_LABEL, invoicedToDate);
-      extractedInformation.put(CURRENT_PROJECT_POSITION_LABEL, currentProjectPosition);
-      
-    } else {
-      // Internal Project Review
-      Matcher internalProjectReviewMatcher
-          = Pattern.compile(INTERNAL_PROJECT_REVIEW_EX, Pattern.MULTILINE).matcher(firstPageContent);
-      // TODO: error handle
-      internalProjectReviewMatcher.find();
-
-      String budgetPositionTextMatch = internalProjectReviewMatcher.group(1);
-      String totalBudgetMatch = internalProjectReviewMatcher.group(2);
-      String totalCommittedMatch = internalProjectReviewMatcher.group(3);
-      String budgetPositionValueMatch = internalProjectReviewMatcher.group(4);
-
-      extractedInformation.put(BUDGET_POSITION_TEXT_LABEL, budgetPositionTextMatch);
-      extractedInformation.put(TOTAL_BUDGET_LABEL, totalBudgetMatch);
-      extractedInformation.put(TOTAL_COMMITTED_LABEL, totalCommittedMatch);
-      extractedInformation.put(BUDGET_POSITION_VALUE_LABEL, budgetPositionValueMatch);
-    }
-
-    // Extract information from second page
     PDDocument secondPage = pageQueue.poll();
-    String secondPageContent = textStripper.getText(secondPage);
+    Map<String, String> extractionMap = new HashMap<>();
+    extractInformationIntoMap(firstPage, secondPage, extractionMap);
 
-    // Project Title
-    Matcher projectTitleMatcher = Pattern.compile(PROJECT_TITLE_EX).matcher(secondPageContent);
-    // TODO: error handle
-    projectTitleMatcher.find();
-    String projectTitleMatch = projectTitleMatcher.group(1);
-    extractedInformation.put(PROJECT_TITLE_LABEL, projectTitleMatch);
-
-    // Project Director
-    Matcher projectDirectorMatcher = Pattern.compile(PROJECT_DIRECTOR_EX).matcher(secondPageContent);
-    // TODO: error handle
-    projectDirectorMatcher.find();
-    String projectDirectorMatch = projectDirectorMatcher.group(1);
-    extractedInformation.put(PROJECT_DIRECTOR_LABEL, projectDirectorMatch);
-
-    // Project Manager
-    Matcher projectManagerMatcher = Pattern.compile(PROJECT_MANAGER_EX, Pattern.MULTILINE).matcher(secondPageContent);
-    // TODO: error handle
-    projectManagerMatcher.find();
-    String projectManagerMatch = projectManagerMatcher.group(1);
-    extractedInformation.put(PROJECT_MANAGER_LABEL, projectManagerMatch);
-
-
-    for (String key: extractedInformation.keySet()) {
-      System.out.println(key + ": " + extractedInformation.get(key));
+    for (String key: extractionMap.keySet()) {
+      System.out.println(key + ": " + extractionMap.get(key));
     }
     System.out.println("-------------------------------------------------------");
+
 
     // Replace first
 //    PDDocument filledPVPage = fillProjectReviewPage(projectReviewPage, extractedInformation);
@@ -226,6 +143,100 @@ public class FocalPointProjectReviewPDFCompiler {
 
     resultDoc.save(resultFile.getPath());
     resultDoc.close();
+  }
+
+  private static boolean extractInformationIntoMap(
+      PDDocument firstPage, PDDocument secondPage, Map<String, String> extractionMap)
+      throws IOException {
+
+    boolean allSucceed = true;
+
+    PDFTextStripper textStripper = new PDFTextStripper();
+
+    // Extract information from first page
+    String firstPageContent = textStripper.getText(firstPage);
+
+    final boolean internalProjectReview = firstPageContent.startsWith("Internal");
+
+    // Project code
+    Matcher projectCodeMatcher = Pattern.compile(PROJECT_CODE_EX).matcher(firstPageContent);
+    // TODO: error handle
+    projectCodeMatcher.find();
+    String projectCodeMatch = projectCodeMatcher.group(1);
+    extractionMap.put(PROJECT_CODE_LABEL, projectCodeMatch);
+
+    // Date
+    Matcher dateMatcher = Pattern.compile(DATE_EX).matcher(firstPageContent);
+    // TODO: error handle
+    dateMatcher.find();
+    String dateMatch = dateMatcher.group(1);
+    extractionMap.put(DATE_LABEL, dateMatch);
+
+    if (!internalProjectReview) {
+      // Estimated Project Value and Profit or Overrun
+      Matcher epvAndPorOMatcher = Pattern.compile(EPV_AND_PorO_EX, Pattern.MULTILINE)
+          .matcher(firstPageContent);
+      // TODO: error handle
+      epvAndPorOMatcher.find();
+      String estimatedProjectValueMatch = epvAndPorOMatcher.group(1);
+      String profitOrOverrunMatch = epvAndPorOMatcher.group(2);
+      extractionMap.put(ESTIMATED_PROJECT_VALUE_LABEL, estimatedProjectValueMatch);
+      extractionMap.put(PROFIT_OR_OVERRUN_LABEL, profitOrOverrunMatch);
+
+      // Invoiced to date and current project position
+      Matcher invoicedToDateAndCurrentProjectPositionMatcher
+          = Pattern.compile(INVOICED_TO_DATE_AND_CURRENT_PROJECT_POSITION_EX, Pattern.MULTILINE)
+          .matcher(firstPageContent);
+      // TODO: error handle
+      invoicedToDateAndCurrentProjectPositionMatcher.find();
+      String invoicedToDate = invoicedToDateAndCurrentProjectPositionMatcher.group(1);
+      String currentProjectPosition = invoicedToDateAndCurrentProjectPositionMatcher.group(2);
+      extractionMap.put(INVOICED_TO_DATE_LABEL, invoicedToDate);
+      extractionMap.put(CURRENT_PROJECT_POSITION_LABEL, currentProjectPosition);
+
+    } else {
+      // Internal Project Review
+      Matcher internalProjectReviewMatcher
+          = Pattern.compile(INTERNAL_PROJECT_REVIEW_EX, Pattern.MULTILINE).matcher(firstPageContent);
+      // TODO: error handle
+      internalProjectReviewMatcher.find();
+
+      String budgetPositionTextMatch = internalProjectReviewMatcher.group(1);
+      String totalBudgetMatch = internalProjectReviewMatcher.group(2);
+      String totalCommittedMatch = internalProjectReviewMatcher.group(3);
+      String budgetPositionValueMatch = internalProjectReviewMatcher.group(4);
+
+      extractionMap.put(BUDGET_POSITION_TEXT_LABEL, budgetPositionTextMatch);
+      extractionMap.put(TOTAL_BUDGET_LABEL, totalBudgetMatch);
+      extractionMap.put(TOTAL_COMMITTED_LABEL, totalCommittedMatch);
+      extractionMap.put(BUDGET_POSITION_VALUE_LABEL, budgetPositionValueMatch);
+    }
+
+    // Extract information from second page
+    String secondPageContent = textStripper.getText(secondPage);
+
+    // Project Title
+    Matcher projectTitleMatcher = Pattern.compile(PROJECT_TITLE_EX).matcher(secondPageContent);
+    // TODO: error handle
+    projectTitleMatcher.find();
+    String projectTitleMatch = projectTitleMatcher.group(1);
+    extractionMap.put(PROJECT_TITLE_LABEL, projectTitleMatch);
+
+    // Project Director
+    Matcher projectDirectorMatcher = Pattern.compile(PROJECT_DIRECTOR_EX).matcher(secondPageContent);
+    // TODO: error handle
+    projectDirectorMatcher.find();
+    String projectDirectorMatch = projectDirectorMatcher.group(1);
+    extractionMap.put(PROJECT_DIRECTOR_LABEL, projectDirectorMatch);
+
+    // Project Manager
+    Matcher projectManagerMatcher = Pattern.compile(PROJECT_MANAGER_EX, Pattern.MULTILINE).matcher(secondPageContent);
+    // TODO: error handle
+    projectManagerMatcher.find();
+    String projectManagerMatch = projectManagerMatcher.group(1);
+    extractionMap.put(PROJECT_MANAGER_LABEL, projectManagerMatch);
+
+    return allSucceed;
   }
 
   private static PDDocument fillProjectReviewPage(PDDocument projectReviewPage, Map<String, String> formFields) {
