@@ -20,6 +20,8 @@ import org.apache.pdfbox.text.PDFTextStripper;
 public class FocalPointProjectReviewPDFCompiler {
 
   private static final String END_OF_SECTION_TOKEN = "Sub Total Project";
+  private static final String INDICATES_PROBLEM = "X";
+
 
   // First page expressions and labels
   private static final String PROJECT_CODE_EX = "Project\\s*?Review\\s*?(.+?)\\s";
@@ -57,10 +59,6 @@ public class FocalPointProjectReviewPDFCompiler {
 
   private static final String PROJECT_MANAGER_EX = "Manager:\\s*(.+?)\\s*?$";
   private static final String PROJECT_MANAGER_LABEL = "Project manager";
-
-  public static void compilePDF(File suffix, File document) throws IOException {
-    compilePDF(suffix, document, new File("").getAbsoluteFile());
-  }
 
   public static void compilePDF(
       File focalPointDocumentFile,
@@ -115,11 +113,6 @@ public class FocalPointProjectReviewPDFCompiler {
     Map<String, String> extractionMap = new HashMap<>();
     boolean allExtractionSuccess = extractInformationIntoMap(firstPage, secondPage, extractionMap);
 
-    for (String key: extractionMap.keySet()) {
-      System.out.println(key + ": " + extractionMap.get(key));
-    }
-    System.out.println("-------------------------------------------------------");
-
     // Replace first page with project review page (filled if success)
     if (allExtractionSuccess) {
       PDDocument filledPVPage = fillProjectReviewPage(projectReviewPage, extractionMap);
@@ -129,6 +122,13 @@ public class FocalPointProjectReviewPDFCompiler {
       merger.appendDocument(resultDoc, projectReviewPage);
     }
 
+    // Append second page
+    merger.appendDocument(resultDoc, secondPage);
+
+    // Close pages
+    firstPage.close();
+    secondPage.close();
+
     // Read any remaining pages from the page queue
     while (!pageQueue.isEmpty()) {
       PDDocument page = pageQueue.poll();
@@ -136,7 +136,19 @@ public class FocalPointProjectReviewPDFCompiler {
       page.close();
     }
 
-    String resultName = "testOutput.pdf";
+    final String gap = " ";
+    String projectManager = extractionMap.get(PROJECT_MANAGER_LABEL);
+    projectManager = projectManager == null ? gap : projectManager;
+
+    String projectCode = extractionMap.get(PROJECT_CODE_LABEL);
+    projectCode = projectCode == null ? gap : projectCode;
+
+    String date = extractionMap.get(DATE_LABEL);
+    date = date == null ? gap : date.replaceAll("/", "_");
+
+    String showProblem = allExtractionSuccess ? "" : INDICATES_PROBLEM;
+
+    String resultName = String.format("%s-%s-%s%s.pdf", projectManager, projectCode, date, showProblem);
     PDFNamer pdfNamer = new NoOverwritePDFNamer(new StringPDFNamer(resultName), outputDirectory);
 
     File resultFile = new File(outputDirectory, pdfNamer.namePDF(resultDoc));
@@ -261,7 +273,9 @@ public class FocalPointProjectReviewPDFCompiler {
 
   private static PDDocument fillProjectReviewPage(PDDocument projectReviewPage, Map<String, String> formFields) {
     // TODO
-    return projectReviewPage;
+    PDDocument filledProjectReviewPage = new PDDocument();
+    filledProjectReviewPage.addPage(projectReviewPage.getPage(0));
+    return filledProjectReviewPage;
   }
 
 
