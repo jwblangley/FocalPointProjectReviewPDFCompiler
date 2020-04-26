@@ -12,9 +12,15 @@ import java.util.regex.Pattern;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.NoOverwritePDFNamer;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.PDFNamer;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.StringPDFNamer;
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
+import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.apache.pdfbox.text.PDFTextStripper;
 
 public class FocalPointProjectReviewPDFCompiler {
@@ -211,10 +217,10 @@ public class FocalPointProjectReviewPDFCompiler {
       if (!invoicedToDateAndCurrentProjectPositionMatcher.find()) {
         allSucceed = false;
       } else {
-        String invoicedToDate = invoicedToDateAndCurrentProjectPositionMatcher.group(1);
-        String currentProjectPosition = invoicedToDateAndCurrentProjectPositionMatcher.group(2);
-        extractionMap.put(INVOICED_TO_DATE_LABEL, invoicedToDate);
-        extractionMap.put(CURRENT_PROJECT_POSITION_LABEL, currentProjectPosition);
+        String invoicedToDateMatch = invoicedToDateAndCurrentProjectPositionMatcher.group(1);
+        String currentProjectPositionMatch = invoicedToDateAndCurrentProjectPositionMatcher.group(2);
+        extractionMap.put(INVOICED_TO_DATE_LABEL, invoicedToDateMatch);
+        extractionMap.put(CURRENT_PROJECT_POSITION_LABEL, currentProjectPositionMatch);
       }
 
     } else {
@@ -271,10 +277,27 @@ public class FocalPointProjectReviewPDFCompiler {
     return allSucceed;
   }
 
-  private static PDDocument fillProjectReviewPage(PDDocument projectReviewPage, Map<String, String> formFields) {
-    // TODO
+  private static PDDocument fillProjectReviewPage(PDDocument projectReviewPage, Map<String, String> formFields)
+      throws IOException {
+    // Clone projectReviewPage into filledProjectReviewPage
     PDDocument filledProjectReviewPage = new PDDocument();
-    filledProjectReviewPage.addPage(projectReviewPage.getPage(0));
+    PDFMergerUtility merger = new PDFMergerUtility();
+    merger.appendDocument(filledProjectReviewPage, projectReviewPage);
+
+    // Extract form
+    PDDocumentCatalog docCatalog = filledProjectReviewPage.getDocumentCatalog();
+    PDAcroForm acroForm = docCatalog.getAcroForm();
+
+    // Populate form fields
+    for (PDField field : acroForm.getFields()) {
+      String fieldName = field.getFullyQualifiedName();
+      String fieldValue = formFields.get(fieldName);
+
+      if (fieldValue != null) {
+        field.setValue(fieldValue);
+      }
+    }
+
     return filledProjectReviewPage;
   }
 
