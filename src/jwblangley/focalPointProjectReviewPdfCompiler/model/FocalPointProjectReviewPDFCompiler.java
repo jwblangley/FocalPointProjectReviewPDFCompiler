@@ -24,6 +24,9 @@ public class FocalPointProjectReviewPDFCompiler {
   private static final String PROJECT_CODE_EX = "Project\\s*?Review\\s*?(.+?)\\s";
   private static final String PROJECT_CODE_LABEL = "Project code";
 
+  private static final String DATE_EX = "Project\\s*?Director\\s*?by\\s*(\\d\\d/\\d\\d/\\d\\d\\d\\d)";
+  private static final String DATE_LABEL = "By date";
+
   // N.B: might be left blank
   private static final String ESTIMATED_PROJECT_VALUE_EX
       = "Project\\s*?Manager:\\s*?$\\s*(.*?)$?\\s*.+?$\\s*.+?$\\s*Project\\s*?title";
@@ -94,12 +97,23 @@ public class FocalPointProjectReviewPDFCompiler {
     PDDocument firstPage = pageQueue.poll();
     String firstPageContent = textStripper.getText(firstPage);
 
+    System.out.println(firstPageContent);
+    System.out.println("-----------------------------------------------------------------");
+
     // Project code
     Matcher projectCodeMatcher = Pattern.compile(PROJECT_CODE_EX).matcher(firstPageContent);
     // TODO: error handle
     projectCodeMatcher.find();
     String projectCodeMatch = projectCodeMatcher.group(1);
     extractedInformation.put(PROJECT_CODE_LABEL, projectCodeMatch);
+
+    // Date
+    Matcher dateMatcher = Pattern.compile(DATE_EX).matcher(firstPageContent);
+    // TODO: error handle
+    dateMatcher.find();
+    String dateMatch = dateMatcher.group(1);
+    System.out.println("dateMatch = " + dateMatch);
+    extractedInformation.put(DATE_LABEL, dateMatch);
 
     // Estimated Project Value
     Matcher estimatedProjectValueMatcher = Pattern.compile(ESTIMATED_PROJECT_VALUE_EX, Pattern.MULTILINE).matcher(firstPageContent);
@@ -122,8 +136,8 @@ public class FocalPointProjectReviewPDFCompiler {
     PDDocument secondPage = pageQueue.poll();
     String secondPageContent = textStripper.getText(secondPage);
 
-    System.out.println(secondPageContent);
-    System.out.println("-------------------------------------------------");
+//    System.out.println(secondPageContent);
+//    System.out.println("-------------------------------------------------");
 
 
     // Replace first
