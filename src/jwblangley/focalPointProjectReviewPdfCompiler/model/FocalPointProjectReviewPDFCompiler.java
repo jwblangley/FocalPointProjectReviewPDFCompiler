@@ -28,7 +28,7 @@ public class FocalPointProjectReviewPDFCompiler {
   private static final String DATE_EX = "Project\\s*?Director\\s*?by\\s*(\\d\\d/\\d\\d/\\d\\d\\d\\d)";
   private static final String DATE_LABEL = "By date";
 
-  // N.B: might be left blank
+  // N.B: Estimated project value might be left blank
   private static final String EPV_AND_PorO_EX
       = "Project\\s*?Manager:\\s*?$\\s*(.*?)$?\\s*.+?$\\s*(.+)?$\\s*Project\\s*?title";
   private static final String ESTIMATED_PROJECT_VALUE_LABEL = "Estimated total";
@@ -38,6 +38,15 @@ public class FocalPointProjectReviewPDFCompiler {
       = "Project\\s*?title:\\s*?$\\s*(.*?)$\\s*(.*?)$";
   private static final String INVOICED_TO_DATE_LABEL = "Total invoiced";
   private static final String CURRENT_PROJECT_POSITION_LABEL = "Current position";
+
+  // Internal Project Review Items
+  private static final String INTERNAL_PROJECT_REVIEW_EX
+      = "Project\\s*?title:\\s*?$\\s*(.+?)$\\s*(.+?)$\\s*(.+?)$\\s*(.+?)$\\s*Confidential";
+  private static final String TOTAL_BUDGET_LABEL = "Total budget";
+  private static final String TOTAL_COMMITTED_LABEL = "Total committed";
+  private static final String BUDGET_POSITION_VALUE_LABEL = "Budget position value";
+  private static final String BUDGET_POSITION_TEXT_LABEL = "Budget position text";
+
 
   // Second page expressions and labels
   private static final String PROJECT_TITLE_EX = "Project:\\s*(.+?)\\s*Director";
@@ -108,7 +117,7 @@ public class FocalPointProjectReviewPDFCompiler {
     PDDocument firstPage = pageQueue.poll();
     String firstPageContent = textStripper.getText(firstPage);
 
-    boolean internalProjectReview = firstPageContent.startsWith("Internal");
+    final boolean internalProjectReview = firstPageContent.startsWith("Internal");
 
     // Project code
     Matcher projectCodeMatcher = Pattern.compile(PROJECT_CODE_EX).matcher(firstPageContent);
@@ -124,24 +133,45 @@ public class FocalPointProjectReviewPDFCompiler {
     String dateMatch = dateMatcher.group(1);
     extractedInformation.put(DATE_LABEL, dateMatch);
 
-    // Estimated Project Value
-    Matcher epvAndPorOMatcher = Pattern.compile(EPV_AND_PorO_EX, Pattern.MULTILINE).matcher(firstPageContent);
-    // TODO: error handle
-    epvAndPorOMatcher.find();
-    String estimatedProjectValueMatch = epvAndPorOMatcher.group(1);
-    String profitOrOverrunMatch = epvAndPorOMatcher.group(2);
-    extractedInformation.put(ESTIMATED_PROJECT_VALUE_LABEL, estimatedProjectValueMatch);
-    extractedInformation.put(PROFIT_OR_OVERRUN_LABEL, profitOrOverrunMatch);
+    if (!internalProjectReview) {
+      // Estimated Project Value and Profit or Overrun
+      Matcher epvAndPorOMatcher = Pattern.compile(EPV_AND_PorO_EX, Pattern.MULTILINE)
+          .matcher(firstPageContent);
+      // TODO: error handle
+      epvAndPorOMatcher.find();
+      String estimatedProjectValueMatch = epvAndPorOMatcher.group(1);
+      String profitOrOverrunMatch = epvAndPorOMatcher.group(2);
+      extractedInformation.put(ESTIMATED_PROJECT_VALUE_LABEL, estimatedProjectValueMatch);
+      extractedInformation.put(PROFIT_OR_OVERRUN_LABEL, profitOrOverrunMatch);
 
-    // Invoiced to date and current project position
-    Matcher invoicedToDateAndCurrentProjectPositionMatcher
-        = Pattern.compile(INVOICED_TO_DATE_AND_CURRENT_PROJECT_POSITION_EX, Pattern.MULTILINE).matcher(firstPageContent);
-    // TODO: error handle
-    invoicedToDateAndCurrentProjectPositionMatcher.find();
-    String invoicedToDate = invoicedToDateAndCurrentProjectPositionMatcher.group(1);
-    String currentProjectPosition = invoicedToDateAndCurrentProjectPositionMatcher.group(2);
-    extractedInformation.put(INVOICED_TO_DATE_LABEL, invoicedToDate);
-    extractedInformation.put(CURRENT_PROJECT_POSITION_LABEL, currentProjectPosition);
+      // Invoiced to date and current project position
+      Matcher invoicedToDateAndCurrentProjectPositionMatcher
+          = Pattern.compile(INVOICED_TO_DATE_AND_CURRENT_PROJECT_POSITION_EX, Pattern.MULTILINE)
+          .matcher(firstPageContent);
+      // TODO: error handle
+      invoicedToDateAndCurrentProjectPositionMatcher.find();
+      String invoicedToDate = invoicedToDateAndCurrentProjectPositionMatcher.group(1);
+      String currentProjectPosition = invoicedToDateAndCurrentProjectPositionMatcher.group(2);
+      extractedInformation.put(INVOICED_TO_DATE_LABEL, invoicedToDate);
+      extractedInformation.put(CURRENT_PROJECT_POSITION_LABEL, currentProjectPosition);
+      
+    } else {
+      // Internal Project Review
+      Matcher internalProjectReviewMatcher
+          = Pattern.compile(INTERNAL_PROJECT_REVIEW_EX, Pattern.MULTILINE).matcher(firstPageContent);
+      // TODO: error handle
+      internalProjectReviewMatcher.find();
+
+      String budgetPositionTextMatch = internalProjectReviewMatcher.group(1);
+      String totalBudgetMatch = internalProjectReviewMatcher.group(2);
+      String totalCommittedMatch = internalProjectReviewMatcher.group(3);
+      String budgetPositionValueMatch = internalProjectReviewMatcher.group(4);
+
+      extractedInformation.put(BUDGET_POSITION_TEXT_LABEL, budgetPositionTextMatch);
+      extractedInformation.put(TOTAL_BUDGET_LABEL, totalBudgetMatch);
+      extractedInformation.put(TOTAL_COMMITTED_LABEL, totalCommittedMatch);
+      extractedInformation.put(BUDGET_POSITION_VALUE_LABEL, budgetPositionValueMatch);
+    }
 
     // Extract information from second page
     PDDocument secondPage = pageQueue.poll();
@@ -169,9 +199,10 @@ public class FocalPointProjectReviewPDFCompiler {
     extractedInformation.put(PROJECT_MANAGER_LABEL, projectManagerMatch);
 
 
-//    for (String key: extractedInformation.keySet()) {
-//      System.out.println(key + ": " + extractedInformation.get(key));
-//    }
+    for (String key: extractedInformation.keySet()) {
+      System.out.println(key + ": " + extractedInformation.get(key));
+    }
+    System.out.println("-------------------------------------------------------");
 
     // Replace first
 //    PDDocument filledPVPage = fillProjectReviewPage(projectReviewPage, extractedInformation);
