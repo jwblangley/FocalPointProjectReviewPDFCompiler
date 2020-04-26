@@ -12,13 +12,10 @@ import java.util.regex.Pattern;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.NoOverwritePDFNamer;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.PDFNamer;
 import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.StringPDFNamer;
-import org.apache.pdfbox.cos.COSDictionary;
-import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
-import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.apache.pdfbox.text.PDFTextStripper;
@@ -26,7 +23,8 @@ import org.apache.pdfbox.text.PDFTextStripper;
 public class FocalPointProjectReviewPDFCompiler {
 
   private static final String END_OF_SECTION_TOKEN = "Sub Total Project";
-  private static final String INDICATES_PROBLEM = "X";
+  private static final String INDICATES_PROBLEM = "___CHECK___-";
+  private static final String GAP = "___";
 
 
   // First page expressions and labels
@@ -142,19 +140,21 @@ public class FocalPointProjectReviewPDFCompiler {
       page.close();
     }
 
-    final String gap = " ";
+    // Name the document
+
+    // Extract information needed for filename with fallover
     String projectManager = extractionMap.get(PROJECT_MANAGER_LABEL);
-    projectManager = projectManager == null ? gap : projectManager;
+    projectManager = projectManager == null ? GAP : projectManager;
 
     String projectCode = extractionMap.get(PROJECT_CODE_LABEL);
-    projectCode = projectCode == null ? gap : projectCode;
+    projectCode = projectCode == null ? GAP : projectCode;
 
     String date = extractionMap.get(DATE_LABEL);
-    date = date == null ? gap : date.replaceAll("/", "_");
+    date = date == null ? GAP : date.replaceAll("/", "_");
 
     String showProblem = allExtractionSuccess ? "" : INDICATES_PROBLEM;
 
-    String resultName = String.format("%s-%s-%s%s.pdf", projectManager, projectCode, date, showProblem);
+    String resultName = String.format("%s%s-%s-%s.pdf", showProblem, projectManager, projectCode, date);
     PDFNamer pdfNamer = new NoOverwritePDFNamer(new StringPDFNamer(resultName), outputDirectory);
 
     File resultFile = new File(outputDirectory, pdfNamer.namePDF(resultDoc));
