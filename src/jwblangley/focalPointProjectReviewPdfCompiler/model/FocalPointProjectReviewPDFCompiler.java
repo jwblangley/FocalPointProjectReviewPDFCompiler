@@ -21,6 +21,7 @@ public class FocalPointProjectReviewPDFCompiler {
 
   private static final String END_OF_SECTION_TOKEN = "Sub Total Project";
 
+  // First page expressions and labels
   private static final String PROJECT_CODE_EX = "Project\\s*?Review\\s*?(.+?)\\s";
   private static final String PROJECT_CODE_LABEL = "Project code";
 
@@ -28,15 +29,25 @@ public class FocalPointProjectReviewPDFCompiler {
   private static final String DATE_LABEL = "By date";
 
   // N.B: might be left blank
-  private static final String ESTIMATED_PROJECT_VALUE_EX
-      = "Project\\s*?Manager:\\s*?$\\s*(.*?)$?\\s*.+?$\\s*.+?$\\s*Project\\s*?title";
+  private static final String EPV_AND_PorO_EX
+      = "Project\\s*?Manager:\\s*?$\\s*(.*?)$?\\s*.+?$\\s*(.+)?$\\s*Project\\s*?title";
   private static final String ESTIMATED_PROJECT_VALUE_LABEL = "Estimated total";
+  private static final String PROFIT_OR_OVERRUN_LABEL = "Profit or Overrun";
 
   private static final String INVOICED_TO_DATE_AND_CURRENT_PROJECT_POSITION_EX
       = "Project\\s*?title:\\s*?$\\s*(.*?)$\\s*(.*?)$";
-  private static final String INVOICED_TO_DATE_LABEL = "Estimated total";
-  private static final String CURRENT_PROJECT_POSITION_LABEL = "Estimated total";
+  private static final String INVOICED_TO_DATE_LABEL = "Total invoiced";
+  private static final String CURRENT_PROJECT_POSITION_LABEL = "Current position";
 
+  // Second page expressions and labels
+  private static final String PROJECT_TITLE_EX = "Project:\\s*(.+?)\\s*Director";
+  private static final String PROJECT_TITLE_LABEL = "Project title";
+
+  private static final String PROJECT_DIRECTOR_EX = "Director:\\s*(.+?)\\s*Project\\s*Manager";
+  private static final String PROJECT_DIRECTOR_LABEL = "Project Director";
+
+  private static final String PROJECT_MANAGER_EX = "Manager:\\s*(.+?)\\s*?$";
+  private static final String PROJECT_MANAGER_LABEL = "Project manager";
 
   public static void compilePDF(File suffix, File document) throws IOException {
     compilePDF(suffix, document, new File("").getAbsoluteFile());
@@ -97,8 +108,7 @@ public class FocalPointProjectReviewPDFCompiler {
     PDDocument firstPage = pageQueue.poll();
     String firstPageContent = textStripper.getText(firstPage);
 
-    System.out.println(firstPageContent);
-    System.out.println("-----------------------------------------------------------------");
+    boolean internalProjectReview = firstPageContent.startsWith("Internal");
 
     // Project code
     Matcher projectCodeMatcher = Pattern.compile(PROJECT_CODE_EX).matcher(firstPageContent);
@@ -112,15 +122,16 @@ public class FocalPointProjectReviewPDFCompiler {
     // TODO: error handle
     dateMatcher.find();
     String dateMatch = dateMatcher.group(1);
-    System.out.println("dateMatch = " + dateMatch);
     extractedInformation.put(DATE_LABEL, dateMatch);
 
     // Estimated Project Value
-    Matcher estimatedProjectValueMatcher = Pattern.compile(ESTIMATED_PROJECT_VALUE_EX, Pattern.MULTILINE).matcher(firstPageContent);
+    Matcher epvAndPorOMatcher = Pattern.compile(EPV_AND_PorO_EX, Pattern.MULTILINE).matcher(firstPageContent);
     // TODO: error handle
-    estimatedProjectValueMatcher.find();
-    String estimatedProjectValueMatch = estimatedProjectValueMatcher.group(1);
+    epvAndPorOMatcher.find();
+    String estimatedProjectValueMatch = epvAndPorOMatcher.group(1);
+    String profitOrOverrunMatch = epvAndPorOMatcher.group(2);
     extractedInformation.put(ESTIMATED_PROJECT_VALUE_LABEL, estimatedProjectValueMatch);
+    extractedInformation.put(PROFIT_OR_OVERRUN_LABEL, profitOrOverrunMatch);
 
     // Invoiced to date and current project position
     Matcher invoicedToDateAndCurrentProjectPositionMatcher
@@ -136,9 +147,31 @@ public class FocalPointProjectReviewPDFCompiler {
     PDDocument secondPage = pageQueue.poll();
     String secondPageContent = textStripper.getText(secondPage);
 
-//    System.out.println(secondPageContent);
-//    System.out.println("-------------------------------------------------");
+    // Project Title
+    Matcher projectTitleMatcher = Pattern.compile(PROJECT_TITLE_EX).matcher(secondPageContent);
+    // TODO: error handle
+    projectTitleMatcher.find();
+    String projectTitleMatch = projectTitleMatcher.group(1);
+    extractedInformation.put(PROJECT_TITLE_LABEL, projectTitleMatch);
 
+    // Project Director
+    Matcher projectDirectorMatcher = Pattern.compile(PROJECT_DIRECTOR_EX).matcher(secondPageContent);
+    // TODO: error handle
+    projectDirectorMatcher.find();
+    String projectDirectorMatch = projectDirectorMatcher.group(1);
+    extractedInformation.put(PROJECT_DIRECTOR_LABEL, projectDirectorMatch);
+
+    // Project Manager
+    Matcher projectManagerMatcher = Pattern.compile(PROJECT_MANAGER_EX, Pattern.MULTILINE).matcher(secondPageContent);
+    // TODO: error handle
+    projectManagerMatcher.find();
+    String projectManagerMatch = projectManagerMatcher.group(1);
+    extractedInformation.put(PROJECT_MANAGER_LABEL, projectManagerMatch);
+
+
+//    for (String key: extractedInformation.keySet()) {
+//      System.out.println(key + ": " + extractedInformation.get(key));
+//    }
 
     // Replace first
 //    PDDocument filledPVPage = fillProjectReviewPage(projectReviewPage, extractedInformation);
