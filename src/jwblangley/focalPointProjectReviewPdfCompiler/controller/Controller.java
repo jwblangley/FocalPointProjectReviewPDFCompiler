@@ -55,8 +55,11 @@ public class Controller extends Application {
     layout.reportStatus("Working...", true);
     new Thread(() -> {
       try {
-        FocalPointProjectReviewPDFCompiler.compilePDF(focalPointDocument, projectReviewPage, outputDirectory);
-        Platform.runLater(() -> layout.reportStatus("Process complete", true));
+        if (FocalPointProjectReviewPDFCompiler.compilePDF(focalPointDocument, projectReviewPage, outputDirectory)) {
+          Platform.runLater(() -> layout.reportStatus("Process complete", true));
+        } else {
+          Platform.runLater(() -> layout.reportStatus("Process complete - some projects could not be fully processed", false));
+        }
       } catch (IOException e) {
         Platform.runLater(() -> layout.reportStatus("An IO operation failed", false));
         e.printStackTrace();

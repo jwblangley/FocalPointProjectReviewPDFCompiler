@@ -64,10 +64,12 @@ public class FocalPointProjectReviewPDFCompiler {
   private static final String PROJECT_MANAGER_EX = "Manager:\\s*(.+?)\\s*?$";
   private static final String PROJECT_MANAGER_LABEL = "Project manager";
 
-  public static void compilePDF(
+  public static boolean compilePDF(
       File focalPointDocumentFile,
       File projectReviewPageFile,
       File outputDirectory) throws IOException {
+
+    boolean allSucceed = true;
 
     PDDocument focalPointDocument = PDDocument.load(focalPointDocumentFile);
     PDDocument projectReviewPage = PDDocument.load(projectReviewPageFile);
@@ -81,7 +83,8 @@ public class FocalPointProjectReviewPDFCompiler {
       pageQueue.add(page);
 
       if (endOfSectionAt(page)) {
-        compileSection(pageQueue, projectReviewPage, outputDirectory);
+        // N.B: Order of the operands is important as we always want to compileSection
+        allSucceed = compileSection(pageQueue, projectReviewPage, outputDirectory) && allSucceed;
         assert pageQueue.isEmpty(): "compileSection must consume all pages on the page queue";
       }
     }
@@ -91,6 +94,8 @@ public class FocalPointProjectReviewPDFCompiler {
     // Close documents
     focalPointDocument.close();
     projectReviewPage.close();
+
+    return allSucceed;
   }
 
   private static boolean endOfSectionAt(PDDocument page) throws IOException {
@@ -101,7 +106,7 @@ public class FocalPointProjectReviewPDFCompiler {
     return endTokenMatcher.find();
   }
 
-  private static void compileSection(
+  private static boolean compileSection(
       Queue<PDDocument> pageQueue,
       PDDocument projectReviewPage,
       File outputDirectory) throws IOException {
@@ -161,6 +166,8 @@ public class FocalPointProjectReviewPDFCompiler {
 
     resultDoc.save(resultFile.getPath());
     resultDoc.close();
+
+    return allExtractionSuccess;
   }
 
   private static boolean extractInformationIntoMap(
