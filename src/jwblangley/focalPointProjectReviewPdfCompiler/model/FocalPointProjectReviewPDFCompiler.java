@@ -26,42 +26,13 @@ public class FocalPointProjectReviewPDFCompiler {
   private static final String INDICATES_PROBLEM = "___CHECK___-";
   private static final String GAP = "___";
 
-
-  // First page expressions and labels
-  private static final String PROJECT_CODE_EX = "Project\\s*?Review\\s*?(.+?)\\s";
+  // Define labels for identification for use in file name
   private static final String PROJECT_CODE_LABEL = "Project code";
+  private static final String DATE_LABEL = "Date";
+  private static final String PROJECT_MANAGER_LABEL = "Project Manager";
 
-  private static final String DATE_EX = "Project\\s*?Director\\s*?by\\s*(\\d\\d/\\d\\d/\\d\\d\\d\\d)";
-  private static final String DATE_LABEL = "By date";
-
-  // N.B: Estimated project value might be left blank
-  private static final String EPV_AND_PorO_EX
-      = "Project\\s*?Manager:\\s*?$\\s*(.*?)$?\\s*.+?$\\s*(.+)?$\\s*Project\\s*?title";
-  private static final String ESTIMATED_PROJECT_VALUE_LABEL = "Estimated total";
-  private static final String PROFIT_OR_OVERRUN_LABEL = "Profit or Overrun";
-
-  private static final String INVOICED_TO_DATE_AND_CURRENT_PROJECT_POSITION_EX
-      = "Project\\s*?title:\\s*?$\\s*(.*?)$\\s*(.*?)$";
-  private static final String INVOICED_TO_DATE_LABEL = "Total invoiced";
-  private static final String CURRENT_PROJECT_POSITION_LABEL = "Current position";
-
-  // Internal Project Review Items
-  private static final String INTERNAL_PROJECT_REVIEW_EX
-      = "Project\\s*?title:\\s*?$\\s*(.+?)$\\s*(.+?)$\\s*(.+?)$\\s*(.+?)$\\s*Confidential";
-  private static final String TOTAL_BUDGET_LABEL = "Total budget";
-  private static final String TOTAL_COMMITTED_LABEL = "Total committed";
-  private static final String BUDGET_POSITION_VALUE_LABEL = "Budget position value";
-  private static final String BUDGET_POSITION_TEXT_LABEL = "Budget position text";
-
-  // Second page expressions and labels
-  private static final String PROJECT_TITLE_EX = "Project:\\s*(.+?)\\s*Director";
-  private static final String PROJECT_TITLE_LABEL = "Project title";
-
-  private static final String PROJECT_DIRECTOR_EX = "Director:\\s*(.+?)\\s*Project\\s*Manager";
-  private static final String PROJECT_DIRECTOR_LABEL = "Project Director";
-
-  private static final String PROJECT_MANAGER_EX = "Manager:\\s*(.+?)\\s*?$";
-  private static final String PROJECT_MANAGER_LABEL = "Project manager";
+  // Value matcher
+  private static final String LABEL_VALUE_MATCHER = "^(.+?)\\s=\\s(.*?)$";
 
   public static boolean compilePDF(
       File focalPointDocumentFile,
@@ -110,32 +81,23 @@ public class FocalPointProjectReviewPDFCompiler {
       PDDocument projectReviewPage,
       File outputDirectory) throws IOException {
 
-    assert pageQueue.size() >= 2;
+    assert pageQueue.size() >= 1;
 
     PDFMergerUtility merger = new PDFMergerUtility();
     PDDocument resultDoc = new PDDocument();
 
-    // Extract information from first two pages
+    // Extract information from first page
     PDDocument firstPage = pageQueue.poll();
-    PDDocument secondPage = pageQueue.poll();
     Map<String, String> extractionMap = new HashMap<>();
-    boolean allExtractionSuccess = extractInformationIntoMap(firstPage, secondPage, extractionMap);
+    extractInformationIntoMap(firstPage, extractionMap);
 
-    // Replace first page with project review page (filled if success)
-    if (allExtractionSuccess) {
-      PDDocument filledPVPage = fillProjectReviewPage(projectReviewPage, extractionMap);
-      merger.appendDocument(resultDoc, filledPVPage);
-      filledPVPage.close();
-    } else {
-      merger.appendDocument(resultDoc, projectReviewPage);
-    }
+    // Replace first page with project review page
+    PDDocument filledPVPage = fillProjectReviewPage(projectReviewPage, extractionMap);
+    merger.appendDocument(resultDoc, filledPVPage);
+    filledPVPage.close();
 
-    // Append second page
-    merger.appendDocument(resultDoc, secondPage);
-
-    // Close pages
+    // Close first page
     firstPage.close();
-    secondPage.close();
 
     // Read any remaining pages from the page queue
     while (!pageQueue.isEmpty()) {
@@ -145,18 +107,30 @@ public class FocalPointProjectReviewPDFCompiler {
     }
 
     // Name the document
-
-    // Extract information needed for filename with fallover
+    // Use extracted information needed for filename with safe fallover
     String projectManager = extractionMap.get(PROJECT_MANAGER_LABEL);
-    projectManager = projectManager == null ? GAP : projectManager;
-
     String projectCode = extractionMap.get(PROJECT_CODE_LABEL);
-    projectCode = projectCode == null ? GAP : projectCode;
-
     String date = extractionMap.get(DATE_LABEL);
-    date = date == null ? GAP : date.replaceAll("/", "_");
 
-    String showProblem = allExtractionSuccess ? "" : INDICATES_PROBLEM;
+    boolean fileNameExtractedInfoSuccess = true;
+
+    if (projectManager == null) {
+      projectManager = GAP;
+      fileNameExtractedInfoSuccess = false;
+    }
+    if (projectCode == null) {
+      projectCode = GAP;
+      fileNameExtractedInfoSuccess = false;
+    }
+    if (date == null) {
+      date = GAP;
+      fileNameExtractedInfoSuccess = false;
+    } else {
+      // Format date to remove forward slashes '/'
+      date = date.replaceAll("/", "_");
+    }
+
+    String showProblem = fileNameExtractedInfoSuccess ? "" : INDICATES_PROBLEM;
 
     String resultName = String.format("%s%s-%s-%s.pdf",
         showProblem, projectManager, projectCode, date);
@@ -168,129 +142,28 @@ public class FocalPointProjectReviewPDFCompiler {
     resultDoc.save(resultFile.getPath());
     resultDoc.close();
 
-    return allExtractionSuccess;
+    return fileNameExtractedInfoSuccess;
   }
 
-  private static boolean extractInformationIntoMap(
-      PDDocument firstPage, PDDocument secondPage, Map<String, String> extractionMap)
+  private static void extractInformationIntoMap(
+      PDDocument infoPage, Map<String, String> extractionMap)
       throws IOException {
-
-    boolean allSucceed = true;
 
     PDFTextStripper textStripper = new PDFTextStripper();
 
     // Extract information from first page
-    String firstPageContent = textStripper.getText(firstPage);
+    String infoPageContent = textStripper.getText(infoPage);
 
-    final boolean internalProjectReview = firstPageContent.startsWith("Internal");
+    Matcher labelValueMatcher = Pattern
+        .compile(LABEL_VALUE_MATCHER, Pattern.MULTILINE)
+        .matcher(infoPageContent);
 
-    // Project code
-    Matcher projectCodeMatcher = Pattern.compile(PROJECT_CODE_EX).matcher(firstPageContent);
-    if (!projectCodeMatcher.find()) {
-      allSucceed = false;
-    } else {
-      String projectCodeMatch = projectCodeMatcher.group(1);
-      extractionMap.put(PROJECT_CODE_LABEL, projectCodeMatch);
+    while(labelValueMatcher.find()) {
+      String label = labelValueMatcher.group(1);
+      String value = labelValueMatcher.group(2);
+      System.out.println(value);
+      extractionMap.put(label, value);
     }
-
-    // Date
-    Matcher dateMatcher = Pattern.compile(DATE_EX).matcher(firstPageContent);
-    if (!dateMatcher.find()) {
-      allSucceed = false;
-    } else {
-      String dateMatch = dateMatcher.group(1);
-      extractionMap.put(DATE_LABEL, dateMatch);
-    }
-
-    if (!internalProjectReview) {
-
-      // Estimated Project Value and Profit or Overrun
-      Matcher epvAndPorOMatcher
-          = Pattern.compile(EPV_AND_PorO_EX, Pattern.MULTILINE).matcher(firstPageContent);
-
-      if (!epvAndPorOMatcher.find()) {
-        allSucceed = false;
-      } else {
-        String estimatedProjectValueMatch = epvAndPorOMatcher.group(1);
-        String profitOrOverrunMatch = epvAndPorOMatcher.group(2);
-        extractionMap.put(ESTIMATED_PROJECT_VALUE_LABEL, estimatedProjectValueMatch);
-        extractionMap.put(PROFIT_OR_OVERRUN_LABEL, profitOrOverrunMatch);
-      }
-
-      // Invoiced to date and current project position
-      Matcher invoicedToDateAndCurrentProjectPositionMatcher = Pattern
-          .compile(INVOICED_TO_DATE_AND_CURRENT_PROJECT_POSITION_EX, Pattern.MULTILINE)
-          .matcher(firstPageContent);
-
-      if (!invoicedToDateAndCurrentProjectPositionMatcher.find()) {
-        allSucceed = false;
-      } else {
-        String invoicedToDateMatch = invoicedToDateAndCurrentProjectPositionMatcher.group(1);
-        String currentProjectPositionMatch = invoicedToDateAndCurrentProjectPositionMatcher
-            .group(2);
-        extractionMap.put(INVOICED_TO_DATE_LABEL, invoicedToDateMatch);
-        extractionMap.put(CURRENT_PROJECT_POSITION_LABEL, currentProjectPositionMatch);
-      }
-
-    } else {
-      // Internal Project Review
-      Matcher internalProjectReviewMatcher = Pattern
-          .compile(INTERNAL_PROJECT_REVIEW_EX, Pattern.MULTILINE)
-          .matcher(firstPageContent);
-
-      if (!internalProjectReviewMatcher.find()) {
-        allSucceed = false;
-      } else {
-        String budgetPositionTextMatch = internalProjectReviewMatcher.group(1);
-        String totalBudgetMatch = internalProjectReviewMatcher.group(2);
-        String totalCommittedMatch = internalProjectReviewMatcher.group(3);
-        String budgetPositionValueMatch = internalProjectReviewMatcher.group(4);
-
-        extractionMap.put(BUDGET_POSITION_TEXT_LABEL, budgetPositionTextMatch);
-        extractionMap.put(TOTAL_BUDGET_LABEL, totalBudgetMatch);
-        extractionMap.put(TOTAL_COMMITTED_LABEL, totalCommittedMatch);
-        extractionMap.put(BUDGET_POSITION_VALUE_LABEL, budgetPositionValueMatch);
-      }
-
-    }
-
-    // Extract information from second page
-    String secondPageContent = textStripper.getText(secondPage);
-
-    // Project Title
-    Matcher projectTitleMatcher = Pattern.compile(PROJECT_TITLE_EX).matcher(secondPageContent);
-    if (!projectTitleMatcher.find()) {
-      allSucceed = false;
-    } else {
-      String projectTitleMatch = projectTitleMatcher.group(1);
-      extractionMap.put(PROJECT_TITLE_LABEL, projectTitleMatch);
-    }
-
-    // Project Director
-    Matcher projectDirectorMatcher = Pattern
-        .compile(PROJECT_DIRECTOR_EX)
-        .matcher(secondPageContent);
-
-    if (!projectDirectorMatcher.find()) {
-      allSucceed = false;
-    } else {
-      String projectDirectorMatch = projectDirectorMatcher.group(1);
-      extractionMap.put(PROJECT_DIRECTOR_LABEL, projectDirectorMatch);
-    }
-
-    // Project Manager
-    Matcher projectManagerMatcher = Pattern
-        .compile(PROJECT_MANAGER_EX, Pattern.MULTILINE)
-        .matcher(secondPageContent);
-
-    if (!projectManagerMatcher.find()) {
-      allSucceed = false;
-    } else {
-      String projectManagerMatch = projectManagerMatcher.group(1);
-      extractionMap.put(PROJECT_MANAGER_LABEL, projectManagerMatch);
-    }
-
-    return allSucceed;
   }
 
   private static PDDocument fillProjectReviewPage(
