@@ -119,7 +119,7 @@ public class FocalPointProjectReviewPDFCompiler {
       fileNameExtractedInfoSuccess = false;
     } else {
       // Format projectManager to remove forward spaces ' '
-      date = date.replaceAll(" ", "-");
+      projectManager = projectManager.replaceAll("\\s", "-");
     }
 
     if (projectCode == null) {
@@ -166,7 +166,6 @@ public class FocalPointProjectReviewPDFCompiler {
     while(labelValueMatcher.find()) {
       String label = labelValueMatcher.group(1);
       String value = labelValueMatcher.group(2);
-      System.out.println(value);
       extractionMap.put(label, value);
     }
   }

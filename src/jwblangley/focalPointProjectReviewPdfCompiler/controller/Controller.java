@@ -11,7 +11,7 @@ import jwblangley.focalPointProjectReviewPdfCompiler.view.ViewLayout;
 
 public class Controller extends Application {
 
-  private static final String VERSION = "v2.0.1";
+  private static final String VERSION = "v2.0.2";
 
   private ViewLayout layout;
 
