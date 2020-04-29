@@ -117,22 +117,27 @@ public class FocalPointProjectReviewPDFCompiler {
     if (projectManager == null) {
       projectManager = GAP;
       fileNameExtractedInfoSuccess = false;
+    } else {
+      // Format projectManager to remove forward spaces ' '
+      date = date.replaceAll(" ", "-");
     }
+
     if (projectCode == null) {
       projectCode = GAP;
       fileNameExtractedInfoSuccess = false;
     }
+
     if (date == null) {
       date = GAP;
       fileNameExtractedInfoSuccess = false;
     } else {
       // Format date to remove forward slashes '/'
-      date = date.replaceAll("/", "_");
+      date = date.replaceAll("/", "-");
     }
 
     String showProblem = fileNameExtractedInfoSuccess ? "" : INDICATES_PROBLEM;
 
-    String resultName = String.format("%s%s-%s-%s.pdf",
+    String resultName = String.format("%s%s_%s_%s.pdf",
         showProblem, projectManager, projectCode, date);
 
     PDFNamer pdfNamer = new NoOverwritePDFNamer(new StringPDFNamer(resultName), outputDirectory);
