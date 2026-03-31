@@ -2,6 +2,8 @@
 
 Utility to compile FocalPoint project review documents
 
+This project was forked from [jwblangley/PDFSuffixInterleaver](https://github.com/jwblangley/PDFSuffixInterleaver)
+
 ## Building
 
 This application uses gradle to create an *uber jar*: a portable java application with dependencies included.
@@ -24,4 +26,6 @@ For CLI (recommeded for development):
 java -jar ./build/libs/FocalPointCompiler.jar
 ```
 
-#### This project was forked from [jwblangley/PDFSuffixInterleaver](https://github.com/jwblangley/PDFSuffixInterleaver)
+## Contributing
+
+This application is designed using the [Model-View-Controller architecture](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller), please keep to this architecture for future developments
