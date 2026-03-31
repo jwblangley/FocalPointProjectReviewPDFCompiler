@@ -1,4 +1,4 @@
-package jwblangley.focalPointProjectReviewPdfCompiler.model;
+package com.jwblangley.focalPointProjectReviewPdfCompiler.model;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,9 +9,9 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.NoOverwritePDFNamer;
-import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.PDFNamer;
-import jwblangley.focalPointProjectReviewPdfCompiler.filenamer.StringPDFNamer;
+import com.jwblangley.focalPointProjectReviewPdfCompiler.filenamer.NoOverwritePDFNamer;
+import com.jwblangley.focalPointProjectReviewPdfCompiler.filenamer.PDFNamer;
+import com.jwblangley.focalPointProjectReviewPdfCompiler.filenamer.StringPDFNamer;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
 import org.apache.pdfbox.multipdf.Splitter;
 import org.apache.pdfbox.pdmodel.PDDocument;

@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+group = 'com.jwblangley'
+version = '2.0.2'
+
+repositories {
+    mavenCentral()
+}
+
+javafx {
+    version = "21"
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.graphics']
+}
+
+dependencies {
+    implementation 'org.apache.pdfbox:pdfbox:2.0.27'
+}
+
+application {
+    mainClass = 'com.jwblangley.focalPointProjectReviewPdfCompiler.Main'
+}
+
+shadowJar {
+    archiveBaseName.set('FocalPointCompiler')
+    archiveClassifier.set('')
+    archiveVersion.set('')
+}

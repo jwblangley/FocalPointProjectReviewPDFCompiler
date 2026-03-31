@@ -1,4 +1,4 @@
-package jwblangley.focalPointProjectReviewPdfCompiler.controller;
+package com.jwblangley.focalPointProjectReviewPdfCompiler.controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,8 +6,8 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import jwblangley.focalPointProjectReviewPdfCompiler.model.FocalPointProjectReviewPDFCompiler;
-import jwblangley.focalPointProjectReviewPdfCompiler.view.ViewLayout;
+import com.jwblangley.focalPointProjectReviewPdfCompiler.model.FocalPointProjectReviewPDFCompiler;
+import com.jwblangley.focalPointProjectReviewPdfCompiler.view.ViewLayout;
 
 public class Controller extends Application {
 
@@ -81,5 +81,9 @@ public class Controller extends Application {
     stage.setScene(scene);
     stage.centerOnScreen();
     stage.show();
+  }
+
+  public static void main(String[] args) {
+    launch(args);
   }
 }

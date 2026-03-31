@@ -1,4 +1,4 @@
-package jwblangley.focalPointProjectReviewPdfCompiler.view;
+package com.jwblangley.focalPointProjectReviewPdfCompiler.view;
 
 import java.io.File;
 import javafx.event.ActionEvent;
@@ -14,7 +14,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import jwblangley.focalPointProjectReviewPdfCompiler.controller.Controller;
+import com.jwblangley.focalPointProjectReviewPdfCompiler.controller.Controller;
 
 public class ViewLayout {
 

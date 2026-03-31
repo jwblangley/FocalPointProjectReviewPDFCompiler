@@ -3,5 +3,8 @@ out/
 .idea/
 META-INF/
 
+.gradle
+build/
+
 *.pdf
 temp/

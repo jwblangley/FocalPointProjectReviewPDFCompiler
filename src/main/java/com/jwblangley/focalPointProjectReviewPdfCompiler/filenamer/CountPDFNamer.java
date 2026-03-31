@@ -1,4 +1,4 @@
-package jwblangley.focalPointProjectReviewPdfCompiler.filenamer;
+package com.jwblangley.focalPointProjectReviewPdfCompiler.filenamer;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
